@@ -1,0 +1,424 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Resource Service API'
+  description: 'Assessment-Cloud:Resource-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-beta/resource-service/genesis
+tags:
+  - name: ResourceTag
+    description: 访问资源标签.
+  - name: Resource
+    description: 访问资源.
+paths:
+  /rsrctags:
+    post:
+      tags: 
+        - ResourceTag
+      summary: 创建资源标签.
+      description: 创建资源标签.
+      operationId: createRsrcTag
+      requestBody:
+        description: 请求创建的资源标签信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RsrcTagCreatingReq'
+      responses:
+        '201':
+          description: 成功创建资源标签.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsrcTagCreatedResp'
+  /rsrctags/{rsrctag-id}:
+    get:
+      tags: 
+        - ResourceTag
+      summary: 获取指定的资源标签详情.
+      description: 获取指定的资源标签详情.
+      operationId: getRsrcTagById
+      parameters: 
+        - name: rsrctag-id
+          in: path
+          description: 指定rsrctag的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsrcTag'
+        '404':
+          description: 指定的资源标签不存在.
+  /resources:
+    post:
+      tags: 
+        - Resource
+      summary: 创建资源.
+      description: 创建资源.
+      operationId: createResource
+      requestBody:
+        description: 请求创建的资源信息.
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResourceCreatingReq'
+      responses:
+        '201':
+          description: 成功创建资源.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCreatedResp'
+  /resources/{resource-id}:
+    get:
+      tags: 
+        - Resource
+      summary: 获取指定的资源详情.
+      description: 获取指定的资源详情.
+      operationId: getResourceById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '404':
+          description: 指定的资源不存在.
+    patch:
+      tags: 
+        - Resource
+      summary: 修改指定资源的信息.
+      description: 修改指定资源的信息.
+      operationId: patchResourceById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 欲修改的信息.
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResourcePatch'
+      responses:
+        '204':
+          description: 修改成功.
+        '404':
+          description: 指定的资源不存在.
+  /resources/{resource-id}/content/url:
+    get:
+      tags: 
+        - Resource
+      summary: 获取指定资源的内容的实际访问地址.
+      description: 获取指定资源的内容的实际访问地址.
+      operationId: getRsrcContentUrlById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: 资源内容的实际访问地址.
+        '404':
+          description: 指定的资源不存在.
+  /resources/{resource-id}/state:
+    put:
+      tags: 
+        - Resource
+      summary: 更新指定资源的状态.
+      description: 更新指定资源的状态.
+      operationId: updateRsrcStateById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 资源状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RsrcStateUpdatingReq'
+      responses:
+        '204':
+          description: 资源状态更新成功.
+        '404':
+          description: 指定的资源不存在.
+  /resources/{resource-id}/tags:
+    put:
+      tags: 
+        - Resource
+      summary: 更新指定资源的标签集.
+      description: 更新指定资源的标签集.
+      operationId: updateRsrcTagsById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 资源标签集更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RsrcTagsUpdatingReq'
+      responses:
+        '204':
+          description: 资源标签集更新成功.
+        '404':
+          description: 指定的资源不存在.
+components:
+  schemas:
+    RsrcTagCreatingReq:
+      type: object
+      description: 创建资源标签的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - title
+    RsrcTagCreatedResp:
+      type: object
+      description: 资源标签创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    ResourceCreatingReq:
+      type: object
+      description: 创建资源的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        content:
+          type: string
+          format: binary
+          description: 资源内容.
+      required:
+        - title
+        - mediaType
+        - content
+    ResourceCreatedResp:
+      type: object
+      description: 资源创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    ResourcePatch:
+      type: object
+      description: 资源补丁.
+      properties:
+        rsrcLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        content:
+          type: string
+          format: binary
+          description: 资源内容.
+    RsrcStateUpdatingReq:
+      type: object
+      description: 更新资源状态的请求信息.
+      properties:
+        rsrcLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/ResourceState'
+      required: 
+        - rsrcLUTime
+        - newState
+    RsrcTagsUpdatingReq:
+      type: object
+      description: 更新资源标签集的请求信息.
+      properties:
+        rsrcLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newTags:
+          type: array
+          description: 新的标签集.
+          items:
+            type: string
+            description: 资源标签的ID.
+      required: 
+        - rsrcLUTime
+        - newTags
+    RsrcTag:
+      type: object
+      description: 资源标签.用于资源管理.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    Resource:
+      type: object
+      description: 资源.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/ResourceState'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        contentUrl:
+          type: string
+          description: 资源内容的实际访问地址.
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/RsrcTagBrief'
+      required:
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - mediaType
+        - contentUrl
+    ResourceState:
+      type: string
+      description: 资源状态.
+      enum: 
+        - Developing
+        - Usable
+        - Discarded
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    RsrcTagBrief:
+      type: object
+      description: 资源标签的简单形式.
+      properties:
+        id: 
+          type: string
+        title:
+          type: string
+      required: 
+        - id
+        - title
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code

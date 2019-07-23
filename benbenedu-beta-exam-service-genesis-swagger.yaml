@@ -1,0 +1,1149 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Exam Service'
+  description: 'Assessment-Cloud:Exam-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-beta/exam-service/genesis
+tags:
+  - name: AdmissionTicket
+    description: 访问准考证.
+  - name: ExamTag
+    description: 访问考试标签.
+  - name: Exam
+    description: 访问考试.
+  - name: EchainTag
+    description: 访问考试链标签.
+  - name: ExamChain
+    description: 访问考试链.
+paths:
+  /atickets/to/exam/{exam-id}/for/examinee/{examinee-id}:
+    post:
+      tags:
+        - AdmissionTicket
+      summary: 创建准考证.
+      description: 创建准考证.
+      operationId: createAticketByExamAndExaminee
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+        - name: examinee-id
+          in: path
+          description: 指定参考人的ID.
+          required: true
+          schema:
+            type: string
+        - name: epmid
+          in: query
+          description: 指定试卷模子的ID.
+          schema:
+            type: string
+      responses:
+        '201':
+          description: 成功创建准考证.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AticketCreatedResp'
+    get:
+      tags:
+        - AdmissionTicket
+      summary: 获取指定考试下指定参考人的准考证详情.
+      description: 获取指定考试下指定参考人的准考证详情.
+      operationId: getAticketByExamAndExaminee
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+        - name: examinee-id
+          in: path
+          description: 指定参考人的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdmissionTicket'
+        '404':
+          description: 不存在符合指定条件的准考证.
+  /atickets/{aticket-id}:
+    get:
+      tags:
+        - AdmissionTicket
+      summary: 获取指定的准考证详情.
+      description: 获取指定的准考证详情.
+      operationId: getAticketById
+      parameters: 
+        - name: aticket-id
+          in: path
+          description: 指定准考证的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdmissionTicket'
+        '404':
+          description: 指定的准考证不存在.
+  /atickets/{aticket-id}/state:
+    put:
+      tags: 
+        - AdmissionTicket
+      summary: 更新指定准考证的状态.
+      description: 更新指定准考证的状态.
+      operationId: updateAticketStateById
+      parameters: 
+        - name: aticket-id
+          in: path
+          description: 指定准考证的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 准考证状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AticketStateUpdatingReq'
+      responses:
+        '204':
+          description: 准考证状态更新成功.
+        '404':
+          description: 指定的准考证不存在.
+  /atickets/to/exam/{exam-id}:
+    get:
+      tags:
+        - AdmissionTicket
+      summary: 获取指定考试下的所有准考证.
+      description: 获取指定考试下的所有准考证.
+      operationId: getAticketsByExam
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSort'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AticketPage'
+        '404':
+          description: 指定的考试不存在.
+  /examtags:
+    post:
+      tags: 
+        - ExamTag
+      summary: 创建考试标签.
+      description: 创建考试标签.
+      operationId: createExamTag
+      requestBody:
+        description: 请求创建的考试标签信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamTagCreatingReq'
+      responses:
+        '201':
+          description: 成功创建考试标签.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamTagCreatedResp'
+  /examtags/{examtag-id}:
+    get:
+      tags: 
+        - ExamTag
+      summary: 获取指定的考试标签详情.
+      description: 获取指定的考试标签详情.
+      operationId: getExamTagById
+      parameters: 
+        - name: examtag-id
+          in: path
+          description: 指定examtag的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamTag'
+        '404':
+          description: 指定的考试标签不存在.
+  /exams:
+    post:
+      tags:
+        - Exam
+      summary: 创建考试.
+      description: 创建考试.
+      operationId: createExam
+      requestBody:
+        description: 请求创建的考试设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamDesign'
+      responses:
+        '201':
+          description: 成功创建考试.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamCreatedResp'
+  /exams/{exam-id}:
+    get:
+      tags: 
+        - Exam
+      summary: 获取指定的考试详情.
+      description: 获取指定的考试详情.
+      operationId: getExamById
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '404':
+          description: 指定的考试不存在.
+    put:
+      tags:
+        - Exam
+      summary: 更新指定考试的设计.
+      description: 更新指定考试的设计.
+      operationId: updateExamById
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 请求更新的考试设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的考试不存在.
+  /exams/{exam-id}/state:
+    put:
+      tags: 
+        - Exam
+      summary: 更新指定考试的状态.
+      description: 更新指定考试的状态.
+      operationId: updateExamStateById
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 考试状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamStateUpdatingReq'
+      responses:
+        '204':
+          description: 考试状态更新成功.
+        '404':
+          description: 指定的考试不存在.
+  /exams/{exam-id}/tags:
+    put:
+      tags: 
+        - Exam
+      summary: 更新指定考试的标签集.
+      description: 更新指定考试的标签集.
+      operationId: updateExamTagsById
+      parameters: 
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 考试标签集更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamTagsUpdatingReq'
+      responses:
+        '204':
+          description: 考试标签集更新成功.
+        '404':
+          description: 指定的考试不存在.
+  /echaintags:
+    post:
+      tags: 
+        - EchainTag
+      summary: 创建考试链标签.
+      description: 创建考试链标签.
+      operationId: createEchainTag
+      requestBody:
+        description: 请求创建的考试链标签信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchainTagCreatingReq'
+      responses:
+        '201':
+          description: 成功创建考试链标签.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchainTagCreatedResp'
+  /echaintags/{echaintag-id}:
+    get:
+      tags: 
+        - EchainTag
+      summary: 获取指定的考试链标签详情.
+      description: 获取指定的考试链标签详情.
+      operationId: getEchainTagById
+      parameters: 
+        - name: echaintag-id
+          in: path
+          description: 指定echaintag的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchainTag'
+        '404':
+          description: 指定的考试链标签不存在.
+  /examchains:
+    post:
+      tags:
+        - ExamChain
+      summary: 创建考试链.
+      description: 创建考试链.
+      operationId: createExamChain
+      requestBody:
+        description: 请求创建的考试链设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamChainDesign'
+      responses:
+        '201':
+          description: 成功创建考试链.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchainCreatedResp'
+  /examchains/{examchain-id}:
+    get:
+      tags: 
+        - ExamChain
+      summary: 获取指定的考试链详情.
+      description: 获取指定的考试链详情.
+      operationId: getExamChainById
+      parameters: 
+        - name: examchain-id
+          in: path
+          description: 指定考试链的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamChain'
+        '404':
+          description: 指定的考试链不存在.
+    put:
+      tags:
+        - ExamChain
+      summary: 更新指定考试链的设计.
+      description: 更新指定考试链的设计.
+      operationId: updateExamChainById
+      parameters: 
+        - name: examchain-id
+          in: path
+          description: 指定考试链的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 请求更新的考试链设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchainUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的考试链不存在.
+  /examchains/{examchain-id}/state:
+    put:
+      tags: 
+        - ExamChain
+      summary: 更新指定考试链的状态.
+      description: 更新指定考试链的状态.
+      operationId: updateEchainStateById
+      parameters: 
+        - name: examchain-id
+          in: path
+          description: 指定考试链的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 考试链状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchainStateUpdatingReq'
+      responses:
+        '204':
+          description: 考试链状态更新成功.
+        '404':
+          description: 指定的考试链不存在.
+  /examchains/{examchain-id}/tags:
+    put:
+      tags: 
+        - ExamChain
+      summary: 更新指定考试链的标签集.
+      description: 更新指定考试链的标签集.
+      operationId: updateEchainTagsById
+      parameters: 
+        - name: examchain-id
+          in: path
+          description: 指定考试链的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 考试链标签集更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchainTagsUpdatingReq'
+      responses:
+        '204':
+          description: 考试链标签集更新成功.
+        '404':
+          description: 指定的考试链不存在.
+components:
+  schemas:
+    AticketCreatedResp:
+      type: object
+      description: 单个准考证创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    AticketStateUpdatingReq:
+      type: object
+      description: 更新准考证状态的请求信息.
+      properties:
+        atLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/AticketState'
+      required: 
+        - atLUTime
+        - newState
+    AticketPage:
+      description: 准考证分页
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdmissionTicket'
+    ExamTagCreatingReq:
+      type: object
+      description: 创建考试标签的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - title
+    ExamTagCreatedResp:
+      type: object
+      description: 考试标签创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    ExamDesign:
+      type: object
+      description: 考试的设计信息.
+      properties:
+        form:
+          $ref: '#/components/schemas/ExamForm'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 考试引导语.富文本编辑器输出的结果.
+        epMoldPool:
+          type: array
+          description: 试卷模子池.
+          items:
+            $ref: '#/components/schemas/EpMoldBrief'
+        beginTime:
+          type: integer
+          format: int64
+          description: 考试开始时间(timestamp).
+        preEnterDuration:
+          type: integer
+          format: int32
+          description: 开考前的提前进入时间窗(second).
+        postEnterDuration:
+          type: integer
+          format: int32
+          description: 开考后的迟到进入时间窗(second).
+        paperPreFetchDuration:
+          type: integer
+          format: int32
+          description: 开考前的提前获取试卷时间窗(second).
+        duration:
+          type: integer
+          format: int32
+          description: 考试持续时长(second).
+        maxDurationOffset:
+          type: integer
+          format: int32
+          description: 允许的时长顺延最大值(second).
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - form
+        - title
+        - epMoldPool
+    ExamCreatedResp:
+      type: object
+      description: 考试创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    ExamUpdatingReq:
+      type: object
+      description: 更新考试的请求信息.
+      properties:
+        examLUTime: 
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newDesign:
+          $ref: '#/components/schemas/ExamDesign'
+      required:
+        - examLUTime
+        - newDesign
+    ExamStateUpdatingReq:
+      type: object
+      description: 更新考试状态的请求信息.
+      properties:
+        examLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/ExamState'
+      required: 
+        - examLUTime
+        - newState
+    ExamTagsUpdatingReq:
+      type: object
+      description: 更新考试标签集的请求信息.
+      properties:
+        examLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newTags:
+          type: array
+          description: 新的标签集.
+          items:
+            type: string
+            description: 考试标签的ID.
+      required: 
+        - examLUTime
+        - newTags
+    EchainTagCreatingReq:
+      type: object
+      description: 创建考试链标签的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - title
+    EchainTagCreatedResp:
+      type: object
+      description: 考试链标签创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    ExamChainDesign:
+      type: object
+      description: 考试链的设计信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 考试链引导语.富文本编辑器输出的结果.
+        exams:
+          type: array
+          description: 对应的考试序列.
+          items:
+            $ref: '#/components/schemas/ExamBrief'
+        epmSerials:
+          type: array
+          description: 对应的试卷序列群.
+          items:
+            type: array
+            items: 
+              $ref: '#/components/schemas/EpMoldBrief'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required:
+        - title
+        - exams
+    EchainCreatedResp:
+      type: object
+      description: 考试链创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    EchainUpdatingReq:
+      type: object
+      description: 更新考试链的请求信息.
+      properties:
+        echainLUTime: 
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newDesign:
+          $ref: '#/components/schemas/ExamChainDesign'
+      required:
+        - echainLUTime
+        - newDesign
+    EchainStateUpdatingReq:
+      type: object
+      description: 更新考试链状态的请求信息.
+      properties:
+        echainLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/EchainState'
+      required: 
+        - echainLUTime
+        - newState
+    EchainTagsUpdatingReq:
+      type: object
+      description: 更新考试链标签集的请求信息.
+      properties:
+        echainLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newTags:
+          type: array
+          description: 新的标签集.
+          items:
+            type: string
+            description: 考试链标签的ID.
+      required: 
+        - echainLUTime
+        - newTags
+    AdmissionTicket:
+      type: object
+      description: 准考证.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/AticketState'
+        examineeId:
+          type: string
+          description: 参加考试的用户ID
+        examId:
+          type: string
+          description: 考试ID
+        epId:
+          type: string
+          description: 试卷ID
+      required:
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - examineeId
+        - examId
+        - epId
+    AticketState:
+      type: string
+      description: 准考证的状态.
+      enum: 
+        - Usable
+        - Canceled
+    ExamTag:
+      type: object
+      description: 考试标签.用于考试管理.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    Exam:
+      type: object
+      description: 考试.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/ExamState'
+        form:
+          $ref: '#/components/schemas/ExamForm'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 考试引导语.富文本编辑器输出的结果.
+        epMoldPool:
+          type: array
+          description: 试卷模子池.
+          items:
+            $ref: '#/components/schemas/EpMoldBrief'
+        beginTime:
+          type: integer
+          format: int64
+          description: 考试开始时间(timestamp).
+        preEnterDuration:
+          type: integer
+          format: int32
+          description: 开考前的提前进入时间窗(second).
+        postEnterDuration:
+          type: integer
+          format: int32
+          description: 开考后的迟到进入时间窗(second).
+        paperPreFetchDuration:
+          type: integer
+          format: int32
+          description: 开考前的提前获取试卷时间窗(second).
+        duration:
+          type: integer
+          format: int32
+          description: 考试持续时长(second).
+        maxDurationOffset:
+          type: integer
+          format: int32
+          description: 允许的时长顺延最大值(second).
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/ExamTagBrief'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - form
+        - title
+        - epMoldPool
+    ExamState:
+      type: string
+      description: 考试的状态.
+      enum: 
+        - Preparing
+        - Released
+        - Discarded
+    ExamForm:
+      type: string
+      description: 考试的形式.
+      enum:
+        - Enclosed
+        - Public
+    EchainTag:
+      type: object
+      description: 考试链标签.用于考试链管理.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    ExamChain:
+      type: object
+      description: 考试链.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/EchainState'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 考试链引导语.富文本编辑器输出的结果.
+        exams:
+          type: array
+          description: 对应的考试序列.
+          items:
+            $ref: '#/components/schemas/ExamBrief'
+        epmSerials:
+          type: array
+          description: '对应的试卷序列群.指定此属性时,加入考试链的参考人在初始时会被分配确定的试卷序列,由此,其在考试链下的每场考试中的试卷被确定.若未指定此属性,则参考人在考试链下的每场考试中的试卷由具体考试的试卷分配规则确定.'
+          items:
+            type: array
+            items: 
+              $ref: '#/components/schemas/EpMoldBrief'
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/EchainTagBrief'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - exams
+    EpMoldBrief:
+      type: object
+      description: 试卷模子的简单信息.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          description: 标题.
+      required:
+        - id
+        - title
+    ExamTagBrief:
+      type: object
+      description: 考试标签的简单形式.
+      properties:
+        id: 
+          type: string
+        title:
+          type: string
+      required: 
+        - id
+        - title
+    EchainState:
+      type: string
+      description: 考试链的状态.
+      enum: 
+        - Preparing
+        - Released
+        - Discarded
+    ExamBrief:
+      type: object
+      description: 考试的简单信息.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          description: 标题.
+      required:
+        - id
+        - title
+    EchainTagBrief:
+      type: object
+      description: 考试链标签的简单形式.
+      properties:
+        id: 
+          type: string
+        title:
+          type: string
+      required: 
+        - id
+        - title
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    ResourceBrief:
+      type: object
+      description: 资源的简单形式.
+      properties:
+        id:
+          type: string
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types.
+        contentUrl:
+          type: string
+          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+    MediumValue:
+      type: object
+      description: 多媒体形式的值.
+      properties:
+        mark:
+          type: string
+          description: 标记.
+        resource:
+          $ref: '#/components/schemas/ResourceBrief'
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        value:
+          type: string
+          description: 值.
+      required:
+        - mediaType
+      example: 
+        mediaType: "text/plain"
+        value: "tabu"
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        type: integer
+        format: int32
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        type: integer
+        format: int32
+    pageSort:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true

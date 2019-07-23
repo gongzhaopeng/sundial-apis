@@ -1,0 +1,214 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Account Service'
+  description: 'Assessment-Cloud:Account-Service对应的API. Account-Service应部署到外网.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-beta/account-service/genesis
+tags:
+  - name: Account
+    description: 访问账户.
+paths: {}
+components:
+  schemas:
+    Account:
+      type: object
+      description: 账户.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        creator:
+          $ref: '#/components/schemas/AccountCreator'
+        state:
+          $ref: '#/components/schemas/AccountState'
+        affiliation:
+          $ref: '#/components/schemas/AccountAffiliation'
+        idNumber:
+          type: string
+          description: 身份标识号. 如身份证号.
+        mobile:
+          type: string
+          description: 手机.
+        email:
+          type: string
+          description: 电子邮箱.
+        password:
+          type: string
+          description: 密码.
+        wechat:
+          $ref: '#/components/schemas/WechatInfo'
+        type:
+          $ref: '#/components/schemas/AccountType'
+        name:
+          type: string
+          description: 名称.
+        nickname:
+          type: string
+          description: 昵称.
+        gender:
+          type: string
+          description: 性别.
+        birthday:
+          type: string
+          format: date
+          description: 生日.
+        country:
+          type: string
+          description: 国家.
+        province:
+          type: string
+          description: 省份.
+        city:
+          type: string
+          description: 城市.
+        avator:
+          type: string
+          description: 头像URL.
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountRole'
+        echains:
+          type: array
+          description: 所参加的考试链集.
+          items:
+            $ref: '#/components/schemas/AccountEchain'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - creator
+        - state
+        - type
+        - roles
+    AccountState:
+      type: string
+      description: 账户状态.
+      enum:
+        - Unactivated
+        - Active
+        - Locked
+        - Disabled
+        - Abandoned
+    AccountType:
+      type: string
+      description: 账户类型.
+      enum:
+        - Personal
+        - Organization
+        - AgencyL2
+        - AgencyL1
+    AccountRole:
+      type: string
+      description: 账户角色.
+      enum:
+        - NormalUser
+        - SuperAdmin
+        - Admin
+        - QuestionBuilder
+        - ExamPaperBuilder
+        - ExamBuilder
+        - Grader
+        - Analyst
+    WechatInfo:
+      type: object
+      description: 账户关联的微信信息.
+      properties:
+        openid:
+          type: string
+        unionid:
+          type: string
+        latestLogin:
+          $ref: '#/components/schemas/WechatLogin'
+    WechatLogin:
+      type: object
+      description: 微信登录信息.
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          description: 登录时间点.
+        accessToken:
+          type: string
+        expiresAt:
+          type: integer
+          format: int64
+          description: 过期时间点(timestamp).
+        refreshToken:
+          type: string
+    AccountCreator:
+      type: object
+      description: 账户创建者.
+      properties:
+        id:
+          type: string
+          description: 创建者的账户ID.
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    AccountAffiliation:
+      type: object
+      description: 账户从属关系.
+      properties:
+        id:
+          type: string
+          description: 所属账户的ID.
+        name:
+          type: string
+        nickname:
+          type: string
+        foreignId:
+          type: string
+          description: 在所属关系里的外部ID.
+      required: 
+        - id
+    AccountEchain:
+      type: object
+      description: 账户所参与的考试链信息.
+      properties:
+        id:
+          type: string
+        enterTime:
+          type: integer
+          format: int64
+          description: 加入时间(timestamp).
+        title:
+          type: string
+          description: 标题.
+        epmSerialNumber:
+          type: string
+          description: 分配的试卷链编号.
+      required:
+        - id
+        - enterTime
+        - title
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code

@@ -1,0 +1,542 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Question Service API'
+  description: 'Assessment-Cloud:Question-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-alpha/question-service/genesis
+tags:
+  - name: QTag
+    description: 访问题目标签.
+  - name: Question
+    description: 访问题目.
+paths:
+  /qtags:
+    post:
+      tags: 
+        - QTag
+      summary: 创建题目标签.
+      description: 创建题目标签.
+      operationId: createQTag
+      requestBody:
+        description: 请求创建的题目标签信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QTagCreatingReq'
+      responses:
+        '201':
+          description: 成功创建题目标签.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QTagCreatedResp'
+  /qtags/{qtag-id}:
+    get:
+      tags: 
+        - QTag
+      summary: 获取指定的题目标签详情.
+      description: 获取指定的题目标签详情.
+      operationId: getQTagById
+      parameters: 
+        - name: qtag-id
+          in: path
+          description: 指定qtag的ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QTag'
+        '404':
+          description: 指定的题目标签不存在.
+  /questions:
+    post:
+      tags:
+        - Question
+      summary: 创建题目.
+      description: 创建题目.
+      operationId: createQuestion
+      requestBody:
+        description: 请求创建的题目设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionDesign'
+      responses:
+        '201':
+          description: 成功创建题目.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionCreatedResp'
+        '401':
+          description: Unauthorized.
+      security:
+        - answerRepoAuth: []
+  /questions/{question-id}:
+    get:
+      tags: 
+        - Question
+      summary: 获取指定的题目详情.
+      description: 获取指定的题目详情.
+      operationId: getQuestionById
+      parameters: 
+        - name: question-id
+          in: path
+          description: 指定题目的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '404':
+          description: 指定的题目不存在.
+    put:
+      tags:
+        - Question
+      summary: 更新指定题目的设计.
+      description: 更新指定题目的设计.
+      operationId: updateQuestionById
+      parameters: 
+        - name: question-id
+          in: path
+          description: 指定题目的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 请求更新的题目设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的题目不存在.
+  /questions/{question-id}/state:
+    put:
+      tags: 
+        - Question
+      summary: 更新指定题目的状态.
+      description: 更新指定题目的状态.
+      operationId: updateQuestionStateById
+      parameters: 
+        - name: question-id
+          in: path
+          description: 指定题目的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 题目状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionStateUpdatingReq'
+      responses:
+        '204':
+          description: 题目状态更新成功.
+        '404':
+          description: 指定的题目不存在.
+  /questions/{question-id}/tags:
+    put:
+      tags: 
+        - Question
+      summary: 更新指定题目的标签集.
+      description: 更新指定题目的标签集.
+      operationId: updateQuestionTagsById
+      parameters: 
+        - name: question-id
+          in: path
+          description: 指定题目的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 题目标签集更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionTagsUpdatingReq'
+      responses:
+        '204':
+          description: 题目标签集更新成功.
+        '404':
+          description: 指定的题目不存在.
+components:
+  schemas:
+    QTagCreatingReq:
+      type: object
+      description: 创建题目标签的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - title
+    QTagCreatedResp:
+      type: object
+      description: 题目标签创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    QTag:
+      type: object
+      description: 题目标签.用于题目管理.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    QuestionDesign:
+      type: object
+      description: 题目的设计信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        compositeQunit:
+          $ref: '#/components/schemas/CompositeQuestionUnit'
+        difficulty:
+          type: number
+          format: float
+          description: 题目的难度系数.
+      required: 
+        - title
+        - compositeQunit
+    Question:
+      type: object
+      description: 题目.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/QuestionState'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        compositeQunit:
+          $ref: '#/components/schemas/CompositeQuestionUnit'
+        difficulty:
+          type: number
+          format: float
+          description: 题目的难度系数.
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/QTagBrief'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - compositeQunit
+    QuestionCreatedResp:
+      type: object
+      description: 题目创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    QuestionUpdatingReq:
+      type: object
+      description: 更新题目的请求信息.
+      properties:
+        questionLUTime: 
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newDesign:
+          $ref: '#/components/schemas/QuestionDesign'
+      required: 
+        - questionLUTime
+        - newDesign
+    QuestionStateUpdatingReq:
+      type: object
+      description: 更新题目状态的请求信息.
+      properties:
+        questionLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/QuestionState'
+      required: 
+        - questionLUTime
+        - newState
+    QuestionTagsUpdatingReq:
+      type: object
+      description: 更新题目标签集的请求信息.
+      properties:
+        questionLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newTags:
+          type: array
+          description: 新的标签集.
+          items:
+            type: string
+            description: 题目标签的ID.
+      required: 
+        - questionLUTime
+        - newTags
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    QuestionState:
+      type: string
+      description: 题目状态.
+      enum: 
+        - Developing
+        - Usable
+        - Discarded
+    CompositeQuestionUnit:
+      type: object
+      description: 可复合的题目单位.
+      properties:
+        description:
+          type: string
+          description: 描述信息,用于管理.
+        form:
+          type: string
+          description: 题目单位的形式.
+          enum: 
+            - Choice
+            - MChoice
+            - FillIn
+            - QA
+            - Composite
+        stem:
+          type: string
+          description: 题干.富文本编辑器输出的结果.
+            资源由客户端上传至资源服务器(建议添加资源浏览功能).
+        options:
+          type: array
+          description: 可选项集.仅当形式为选择题时出现.
+          items:
+            $ref: '#/components/schemas/QuOption'
+        answerMatchStrategy:
+          $ref: '#/components/schemas/AnswerMatchStrategy'
+        stdAnswers:
+          type: array
+          description: 标准答案集.
+          items:
+            $ref: '#/components/schemas/StdAnswer'
+        subQunits:
+          type: array
+          description: 下属的题目单位集.
+          items:
+            $ref: '#/components/schemas/CompositeQuestionUnit'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - form
+    QuOption:
+      type: object
+      description: 可选项.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 选项编号.
+          minimum: 1
+        content:
+          type: string
+          description: 选项内容.富文本编辑器输出的结果.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - number
+        - content
+    AnswerMatchStrategy:
+      type: object
+      description: 答案匹配策略.
+      properties:
+        type:
+          type: string
+          description: 策略类型.
+          enum: 
+            - OrderSensitiveEqual
+            - OrderInsensitiveEqual
+        metadata:
+          type: object
+          description: 策略元数据.用于定义辅助的策略参数.
+          additionalProperties:
+            type: string
+      required: 
+        - type
+    StdAnswer:
+      type: object
+      description: 标准答案.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 答案编号.编号越小,优先级越高.
+          minimum: 1
+        description:
+          type: string
+          description: 描述信息,用于管理.
+        choices:
+          type: array
+          description: 选择集.用于支持类选择题形式.
+          items:
+            type: integer
+            format: int32
+            description: 选项编号.
+        criteria:
+          type: array
+          description: 非选项形式的答案内容集.用于支持非选择题形式.
+          items:
+            $ref: '#/components/schemas/MediumValue'
+      required: 
+        - number
+    QTagBrief:
+      type: object
+      description: 题目标签的简单形式.
+      properties:
+        id: 
+          type: string
+        title:
+          type: string
+      required: 
+        - id
+        - title
+    ResourceBrief:
+      type: object
+      description: 资源的简单形式.
+      properties:
+        id:
+          type: string
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types.
+        contentUrl:
+          type: string
+          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+    MediumValue:
+      type: object
+      description: 多媒体形式的值.
+      properties:
+        mark:
+          type: string
+          description: 标记.
+        resource:
+          $ref: '#/components/schemas/ResourceBrief'
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        value:
+          type: string
+          description: 值.
+      required:
+        - mediaType
+      example: 
+        mediaType: "text/plain"
+        value: "tabu"
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
+  securitySchemes:
+    answerRepoAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "https://api.benbenedu.cn/openeva/oauth/token"
+          scopes: {}

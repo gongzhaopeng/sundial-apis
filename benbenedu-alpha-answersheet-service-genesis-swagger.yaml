@@ -1,0 +1,466 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'AnswerSheet Service API'
+  description: 'Assessment-Cloud:AnswerSheet-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-alpha/answersheet-service/genesis
+tags: 
+  - name: AnswerSheet
+    description: 访问答卷
+paths:
+  /answersheets:
+    post:
+      tags:
+        - AnswerSheet
+      summary: 提交新答卷.
+      description: 提交新答卷.
+      operationId: submitAnswerSheet
+      requestBody:
+        description: 提交的答卷内容.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerSheetSubmission'
+      responses:
+        '201':
+          description: 答卷提交成功.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/AnswerSheetCreatedResp'
+  /answersheets/{answersheet-id}:
+    get:
+      tags: 
+        - AnswerSheet
+      summary: 获取指定的答卷详情.
+      description: 获取指定的答卷详情.
+      operationId: getAnswerSheetById
+      parameters: 
+        - name: answersheet-id
+          in: path
+          description: 指定答卷的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerSheet'
+        '404':
+          description: 指定的答卷不存在.
+    patch:
+      tags: 
+        - AnswerSheet
+      summary: 修改指定答卷的内容.
+      description: 修改指定答卷的内容.
+      operationId: patchAnswerSheetById
+      parameters: 
+        - name: answersheet-id
+          in: path
+          description: 指定答卷的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 修改内容.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerSheetPatch'
+      responses:
+        '204':
+          description: 修改成功.
+        '404':
+          description: 指定的答卷不存在.
+  /answersheets/match/aticket/{aticket-id}:
+    get:
+      tags: 
+        - AnswerSheet
+      summary: 获取指定准考证对应的答卷详情.
+      description: 获取指定准考证对应的答卷详情.
+      operationId: getAnswerSheetByAticket
+      parameters: 
+        - name: aticket-id
+          in: path
+          description: 指定准考证的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerSheet'
+        '404':
+          description: 指定的答卷不存在.
+  /answersheets/{answersheet-id}/question/{question-path}/qu/{qu-path}/reply:
+    put:
+      tags: 
+        - AnswerSheet
+      summary: 更新指定答卷中指定题目单位的作答内容.
+      description: 更新指定答卷中指定题目单位的作答内容.
+      operationId: updateSpecifiedQuReply
+      parameters: 
+        - name: answersheet-id
+          in: path
+          description: 指定答卷的ID
+          required: true
+          schema:
+            type: string
+        - name: question-path
+          in: path
+          description: 指定题目路径
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+          style: simple
+        - name: qu-path
+          in: path
+          description: 指定题目单位路径
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+          style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuReplyUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的题目单位不存在.
+  /answersheets/{answersheet-id}/eps/{eps-path}/detail:
+    put:
+      tags: 
+        - AnswerSheet
+      summary: 更新指定答卷中指定试卷块的细节信息.
+      description: 更新指定答卷中指定试卷块的细节信息.
+      operationId: updateSpecifiedEpsDetail
+      parameters: 
+        - name: answersheet-id
+          in: path
+          description: 指定答卷的ID
+          required: true
+          schema:
+            type: string
+        - name: eps-path
+          in: path
+          description: 指定试卷块路径
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+          style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpsDetailUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的试卷块不存在.
+components:
+  schemas:
+    AnswerSheetSubmission:
+      type: object
+      description: 提交的答卷信息.
+      properties:
+        aticketId:
+          type: string
+          description: 准考证ID.
+        startTime:
+          type: integer
+          format: int64
+          description: 试卷开始作答时间(timestamp).
+        endTime:
+          type: integer
+          format: int64 
+          description: 试卷结束作答时间(timestamp).
+        quReplies:
+          type: array
+          description: 题目单位作答集.
+          items:
+            $ref: '#/components/schemas/AsQuReply'
+        epsDetails:
+          type: array
+          description: 试卷块信息集.
+          items:
+            $ref: '#/components/schemas/AsEpsDetail'
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+    AnswerSheetCreatedResp:
+      type: object
+      description: 答卷创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    AnswerSheetPatch:
+      type: object
+      description: 答卷补丁.
+      properties:
+        endTime:
+          type: integer
+          format: int64 
+          description: 试卷结束作答时间(timestamp).
+        quReplies:
+          type: array
+          description: 题目单位作答集.
+          items:
+            $ref: '#/components/schemas/AsQuReply'
+        epsDetails:
+          type: array
+          description: 试卷块信息集.
+          items:
+            $ref: '#/components/schemas/AsEpsDetail'
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+    QuReplyUpdatingReq:
+      type: object
+      description: 题目单位作答信息更新请求.
+      properties:
+        questionId:
+          type: string
+          description: 对应题目的ID.
+        choices:
+          type: array
+          description: 选择集.
+          items:
+            type: integer
+            format: int32
+        contents:
+          type: array
+          description: 非选择类型的作答内容集.
+          items:
+            $ref: '#/components/schemas/MediumValue'
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+      required: 
+        - questionId
+    EpsDetailUpdatingReq:
+      type: object
+      description: 试卷块细节信息更新请求.
+      properties:
+        startTime:
+          type: integer
+          format: int64
+          description: 试卷块开始作答时间(timestamp).
+        endTime:
+          type: integer
+          format: int64 
+          description: 试卷块结束作答时间(timestamp).
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+    AnswerSheet:
+      type: object
+      description: 答卷
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        admissionTicket:
+          $ref: '#/components/schemas/AsAdmissionTicket'
+        startTime:
+          type: integer
+          format: int64
+          description: 试卷开始作答时间(timestamp).
+        endTime:
+          type: integer
+          format: int64 
+          description: 试卷结束作答时间(timestamp).
+        quReplies:
+          type: array
+          description: 题目单位作答集.
+          items:
+            $ref: '#/components/schemas/AsQuReply'
+        epsDetails:
+          type: array
+          description: 试卷块信息集.
+          items:
+            $ref: '#/components/schemas/AsEpsDetail'
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+      required: 
+        - id
+        - createTime
+        - admissionTicket
+    AsAdmissionTicket:
+      type: object
+      description: 准考证在答卷内的表示.
+      properties:
+        id:
+          type: string
+          description: 准考证ID.
+        userId:
+          type: string
+          description: 用户ID.
+        examId:
+          type: string
+          description: 考试ID.
+        epId:
+          type: string
+          description: 试卷ID
+      required: 
+        - id
+        - userId
+        - examId
+        - epId
+    AsQuReply:
+      type: object
+      description: 题目单位作答信息.
+      properties:
+        questionPath:
+          type: array
+          description: 所属题目在对应试卷中的路径.
+          items:
+            type: integer
+            format: int32
+        questionId:
+          type: string
+          description: 对应题目的ID.
+        quPath:
+          type: array
+          description: 题目单位在所属题目中的路径.
+          items:
+            type: integer
+            format: int32
+        choices:
+          type: array
+          description: 选择集.
+          items:
+            type: integer
+            format: int32
+        contents:
+          type: array
+          description: 非选择类型的作答内容集.
+          items:
+            $ref: '#/components/schemas/MediumValue'
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+      required: 
+        - questionPath
+        - questionId
+        - quPath
+    AsEpsDetail:
+      type: object
+      description: 试卷块相关的信息.
+      properties:
+        epsPath:
+          type: array
+          description: 试卷块在对应试卷中的路径.
+          items:
+            type: integer
+            format: int32
+        startTime:
+          type: integer
+          format: int64
+          description: 试卷块开始作答时间(timestamp).
+        endTime:
+          type: integer
+          format: int64 
+          description: 试卷块结束作答时间(timestamp).
+        extFeedbacks:
+          type: object
+          description: 扩展的反馈信息集.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+      required: 
+        - epsPath
+    ResourceBrief:
+      type: object
+      description: 资源的简单形式.
+      properties:
+        id:
+          type: string
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types.
+        contentUrl:
+          type: string
+          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+    MediumValue:
+      type: object
+      description: 多媒体形式的值.
+      properties:
+        mark:
+          type: string
+          description: 标记.
+        resource:
+          $ref: '#/components/schemas/ResourceBrief'
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        value:
+          type: string
+          description: 值.
+      required:
+        - mediaType
+      example: 
+        mediaType: "text/plain"
+        value: "tabu"
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code

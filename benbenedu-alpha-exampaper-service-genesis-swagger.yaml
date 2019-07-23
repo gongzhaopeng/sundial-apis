@@ -1,0 +1,830 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'ExamPaper Service API'
+  description: 'Assessment-Cloud:ExamPaper-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/benbenedu-alpha/exampaper-service/genesis
+tags:
+  - name: EpmTag
+    description: 访问试卷模子标签.
+  - name: ExamPaperMold
+    description: 访问试卷模子.
+  - name: ExamPaper
+    description: 访问试卷.
+paths:
+  /epmtags:
+    post:
+      tags: 
+        - EpmTag
+      summary: 创建试卷模子标签.
+      description: 创建试卷模子标签.
+      operationId: createEpmTag
+      requestBody:
+        description: 请求创建的试卷模子标签信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpmTagCreatingReq'
+      responses:
+        '201':
+          description: 成功创建试卷模子标签.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpmTagCreatedResp'
+  /epmtags/{epmtag-id}:
+    get:
+      tags: 
+        - EpmTag
+      summary: 获取指定的试卷模子标签详情.
+      description: 获取指定的试卷模子标签详情.
+      operationId: getEpmTagById
+      parameters: 
+        - name: epmtag-id
+          in: path
+          description: 指定epmtag的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpmTag'
+        '404':
+          description: 指定的试卷模子标签不存在.
+  /epmolds:
+    post:
+      tags:
+        - ExamPaperMold
+      summary: 创建试卷模子.
+      description: 创建试卷模子.
+      operationId: createEpMold
+      requestBody:
+        description: 请求创建的试卷模子设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldDesign'
+      responses:
+        '201':
+          description: 成功创建试卷模子.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldCreatedResp'
+  /epmolds/{epmold-id}:
+    get:
+      tags: 
+        - ExamPaperMold
+      summary: 获取指定的试卷模子详情.
+      description: 获取指定的试卷模子详情.
+      operationId: getEpMoldById
+      parameters: 
+        - name: epmold-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamPaperMold'
+        '404':
+          description: 指定的试卷模子不存在.
+    put:
+      tags:
+        - ExamPaperMold
+      summary: 更新指定试卷模子的设计.
+      description: 更新指定试卷模子的设计.
+      operationId: updateEpMoldById
+      parameters: 
+        - name: epmold-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 请求更新的试卷模子设计信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '404':
+          description: 指定的试卷模子不存在.
+  /epmolds/{epmold-id}/state:
+    put:
+      tags: 
+        - ExamPaperMold
+      summary: 更新指定试卷模子的状态.
+      description: 更新指定试卷模子的状态.
+      operationId: updateEpmStateById
+      parameters: 
+        - name: epmold-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 试卷模子状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpmStateUpdatingReq'
+      responses:
+        '204':
+          description: 试卷模子状态更新成功.
+        '404':
+          description: 指定的试卷模子不存在.
+  /epmolds/{epmold-id}/tags:
+    put:
+      tags: 
+        - ExamPaperMold
+      summary: 更新指定试卷模子的标签集.
+      description: 更新指定试卷模子的标签集.
+      operationId: updateEpmTagsById
+      parameters: 
+        - name: epmold-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 试卷模子标签集更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpmTagsUpdatingReq'
+      responses:
+        '204':
+          description: 试卷模子标签集更新成功.
+        '404':
+          description: 指定的试卷模子不存在.
+  /exampapers:
+    post:
+      tags: 
+        - ExamPaper
+      summary: 创建试卷.
+      description: 创建试卷.
+      operationId: createExamPaper
+      requestBody:
+        description: 创建试卷的请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamPaperCreatingReq'
+      responses:
+        '201':
+          description: 成功创建试卷.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamPaperCreatedResp'
+  /exampapers/{exampaper-id}:
+    get:
+      tags:
+        - ExamPaper
+      summary: 获取指定的试卷详情.
+      description: 获取指定的试卷详情.
+      operationId: getExamPaperById
+      parameters: 
+        - name: exampaper-id
+          in: path
+          description: 指定试卷的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamPaper'
+        '404':
+          description: 指定的试卷不存在.
+components:
+  schemas:
+    EpmTagCreatingReq:
+      type: object
+      description: 创建试卷模子标签的请求信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - title
+    EpmTagCreatedResp:
+      type: object
+      description: 试卷模子标签创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    EpmTag:
+      type: object
+      description: 试卷模子标签.用于试卷模子管理.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息.
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    EpMoldDesign:
+      type: object
+      description: 试卷模子的设计信息.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 试卷引导语.富文本编辑器输出的结果.
+        epsGenerators:
+          type: array
+          description: 试卷块生成器集合.
+          items:
+            $ref: '#/components/schemas/CompositeEpsGenerator'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        defaultQuScore:
+          type: number
+          format: float
+          description: 试卷内题目单位的缺省分值.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - title
+        - epsGenerators
+    ExamPaperMold:
+      type: object
+      description: 试卷模子.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/EpmState'
+        title:
+          type: string
+          description: 标题.
+        description:
+          type: string
+          description: 描述信息, 用于管理.
+        introduction:
+          type: string
+          description: 试卷引导语.富文本编辑器输出的结果.
+        epsGenerators:
+          type: array
+          description: 试卷块生成器集合.
+          items:
+            $ref: '#/components/schemas/CompositeEpsGenerator'
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/EpmTagBrief'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        defaultQuScore:
+          type: number
+          format: float
+          description: 试卷内题目单位的缺省分值.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - epsGenerators
+    EpMoldCreatedResp:
+      type: object
+      description: 试卷模子创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    EpMoldUpdatingReq:
+      type: object
+      description: 更新试卷模子的请求信息.
+      properties:
+        epmLUTime: 
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newDesign:
+          $ref: '#/components/schemas/EpMoldDesign'
+      required:
+        - epmLUTime
+        - newDesign
+    EpmStateUpdatingReq:
+      type: object
+      description: 更新试卷模子状态的请求信息.
+      properties:
+        epmLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/EpmState'
+      required: 
+        - epmLUTime
+        - newState
+    EpmTagsUpdatingReq:
+      type: object
+      description: 更新试卷模子标签集的请求信息.
+      properties:
+        epmLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newTags:
+          type: array
+          description: 新的标签集.
+          items:
+            type: string
+            description: 试卷模子标签的ID.
+      required: 
+        - epmLUTime
+        - newTags
+    ExamPaperCreatingReq:
+      type: object
+      description: 创建试卷的请求信息.
+      properties:
+        admissionTicket:
+          $ref: '#/components/schemas/EpAdmissionTicket'
+        epmId:
+          type: string
+          description: 指定试卷模子的ID
+      required: 
+        - admissionTicket
+        - epmId
+    ExamPaperCreatedResp:
+      type: object
+      description: 试卷创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    EpmState:
+      type: string
+      description: 试卷模子的状态.
+      enum: 
+        - Developing
+        - Usable
+        - Discarded
+    CompositeEpsGenerator:
+      type: object
+      description: 可复合的试卷块生成器.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        purpose:
+          $ref: '#/components/schemas/EpsPurpose'
+        description:
+          type: string
+          description: 描述信息,用于管理.
+        introduction:
+          type: string
+          description: 试卷块引导语.富文本编辑器输出的结果.
+        generateStrategy:
+          $ref: '#/components/schemas/EpsGenerateStrategy'
+        subGenerators:
+          type: array
+          description: 下属的子生成器集.
+          items:
+            $ref: '#/components/schemas/CompositeEpsGenerator'
+        questions:
+          type: array
+          description: 对应的题集.
+          items:
+            $ref: '#/components/schemas/EpQuestion'
+        timeLimit:
+          type: integer
+          format: int32
+          description: 限时.单位(second).
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        defaultQuScore:
+          type: number
+          format: float
+          description: 试卷块范围内缺省的题目单位分值.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required:
+        - title
+        - purpose
+        - generateStrategy
+    EpsPurpose:
+      type: string
+      description: 试卷块的用途.
+      enum:
+        - Formal
+        - Practice
+        - Example
+    EpsGenerateStrategy:
+      type: object
+      description: 试卷块生成策略.
+      properties:
+        type:
+          type: string
+          description: 策略类型.
+          enum:
+            - CompositeFix
+            - CompositeRand
+            - QSetFix
+            - QSetRand
+        metadata:
+          type: object
+          description: 策略元数据.用于定义辅助的策略参数.
+          additionalProperties:
+            type: string
+          example:
+            outputEpsCount: 3
+            outputQuestionCount: 10
+      required: 
+        - type
+    EpQuestion:
+      type: object
+      description: 试卷题目.
+      properties:
+        id:
+          type: string
+          description: 对应的题库中题目的ID
+        title:
+          type: string
+          description: 标题.
+        compositeEpQunit:
+          $ref: '#/components/schemas/CompositeEpQuestionUnit'
+      required: 
+        - id
+        - title
+        - compositeEpQunit
+    CompositeEpQuestionUnit:
+      type: object
+      description: 可复合的试卷题目单位.
+      properties:
+        form:
+          type: string
+          description: 题目单位的形式.
+          enum: 
+            - Choice
+            - MChoice
+            - FillIn
+            - QA
+            - Composite
+        stem:
+          type: string
+          description: 题干.富文本编辑器输出的结果.
+            资源由客户端上传至资源服务器(建议添加资源浏览功能).
+        options:
+          type: array
+          description: 可选项集.仅当形式为选择题时出现.
+          items:
+            $ref: '#/components/schemas/EpQuOption'
+        quScore:
+          type: number
+          format: float
+          description: 题目单位的分值.
+        answerMatchStrategy:
+          $ref: '#/components/schemas/EpAnswerMatchStrategy'
+        stdAnswers:
+          type: array
+          description: 标准答案集.
+          items:
+            $ref: '#/components/schemas/EpStdAnswer'
+        subQunits:
+          type: array
+          description: 下属的题目单位集.
+          items:
+            $ref: '#/components/schemas/CompositeEpQuestionUnit'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - form
+    EpQuOption:
+      type: object
+      description: 可选项.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 选项编号.
+          minimum: 1
+        content:
+          type: string
+          description: 选项内容.富文本编辑器输出的结果.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - number
+        - content
+    EpAnswerMatchStrategy:
+      type: object
+      description: 答案匹配策略.
+      properties:
+        type:
+          type: string
+          description: 策略类型.
+          enum: 
+            - OrderSensitiveEqual
+            - OrderInsensitiveEqual
+        metadata:
+          type: object
+          description: 策略元数据.用于定义辅助的策略参数.
+          additionalProperties:
+            type: string
+      required: 
+        - type
+    EpStdAnswer:
+      type: object
+      description: 标准答案.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 答案编号.编号越小,优先级越高.
+          minimum: 1
+        choices:
+          type: array
+          description: 选择集.用于支持类选择题形式.
+          items:
+            type: integer
+            format: int32
+            description: 选项编号.
+        criteria:
+          type: array
+          description: 非选项形式的答案内容集.用于支持非选择题形式.
+          items:
+            $ref: '#/components/schemas/MediumValue'
+        score:
+          type: number
+          format: float
+          description: 特定标准答案对应的分值.
+      required: 
+        - number
+    EpmTagBrief:
+      type: object
+      description: 试卷模子标签的简单形式.
+      properties:
+        id: 
+          type: string
+        title:
+          type: string
+      required: 
+        - id
+        - title
+    ExamPaper:
+      type: object
+      description: 试卷.
+      properties:
+        id: 
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        admissionTicket:
+          $ref: '#/components/schemas/EpAdmissionTicket'
+        epmId:
+          type: string
+          description: 对应的试卷模子的ID
+        title:
+          type: string
+          description: 标题.
+        introduction:
+          type: string
+          description: 试卷引导语.富文本编辑器输出的结果.
+        sections:
+          type: array
+          description: 包含的试卷块集.
+          items:
+            $ref: '#/components/schemas/CompositeEpSection'
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        defaultQuScore:
+          type: number
+          format: float
+          description: 试卷内题目单位的缺省分值.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - id
+        - createTime
+        - admissionTicket
+        - epmId
+        - title
+        - sections
+    EpAdmissionTicket:
+      type: object
+      description: 准考证在试卷内的表示.
+      properties:
+        id:
+          type: string
+          description: 准考证ID.
+        userId:
+          type: string
+          description: 用户ID.
+        examId:
+          type: string
+          description: 考试ID.
+      required: 
+        - id
+        - userId
+        - examId
+    CompositeEpSection:
+      type: object
+      description: 可复合的试卷块.
+      properties:
+        title:
+          type: string
+          description: 标题.
+        purpose:
+          $ref: '#/components/schemas/EpsPurpose'
+        introduction:
+          type: string
+          description: 试卷块引导语.富文本编辑器输出的结果.
+        subSections:
+          type: array
+          description: 下属的子试卷块集.
+          items:
+            $ref: '#/components/schemas/CompositeEpSection'
+        questions:
+          type: array
+          description: 对应的题集.
+          items:
+            $ref: '#/components/schemas/EpQuestion'
+        timeLimit:
+          type: integer
+          format: int32
+          description: 限时.单位(second).
+        extFeatures:
+          type: object
+          description: 扩展的特征集,有业务含义.
+          additionalProperties:
+            $ref: '#/components/schemas/MediumValue'
+        defaultQuScore:
+          type: number
+          format: float
+          description: 试卷块范围内缺省的题目单位分值.
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
+      required: 
+        - title
+        - purpose
+    ResourceBrief:
+      type: object
+      description: 资源的简单形式.
+      properties:
+        id:
+          type: string
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types.
+        contentUrl:
+          type: string
+          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+    MediumValue:
+      type: object
+      description: 多媒体形式的值.
+      properties:
+        mark:
+          type: string
+          description: 标记.
+        resource:
+          $ref: '#/components/schemas/ResourceBrief'
+        mediaType:
+          type: string
+          externalDocs: 
+            description: wiki
+            url: https://en.wikipedia.org/wiki/Media_type
+          description: mime.types
+        value:
+          type: string
+          description: 值.
+      required:
+        - mediaType
+      example: 
+        mediaType: "text/plain"
+        value: "tabu"
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码.
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
