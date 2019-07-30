@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/benbenedu-beta/resource-service/genesis
+    url: http://192.168.0.158:8999/resource/genesis
 tags:
   - name: ResourceTag
     description: 访问资源标签.
@@ -38,6 +38,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RsrcTagCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /rsrctags/{rsrctag-id}:
     get:
       tags: 
@@ -59,8 +68,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RsrcTag'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源标签不存在.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources:
     post:
       tags: 
@@ -81,6 +97,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
     get:
       tags: 
         - Resource
@@ -111,6 +136,19 @@ paths:
               type: string
               description: 状态.
           style: form
+        - name: mediatypes
+          in: query
+          description: 用于过滤的MediaType集.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              externalDocs: 
+                description: wiki
+                url: https://en.wikipedia.org/wiki/Media_type
+              description: mime.types
+          style: form
       responses:
         '200':
           description: 获取成功.
@@ -118,6 +156,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources/{resource-id}:
     get:
       tags: 
@@ -139,8 +186,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
     patch:
       tags: 
         - Resource
@@ -163,8 +217,19 @@ paths:
       responses:
         '204':
           description: 修改成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources/{resource-id}/content:
     get:
       tags: 
@@ -189,8 +254,15 @@ paths:
                   - type: string
                   - type: string
                     format: binary
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources/{resource-id}/content/url:
     get:
       tags: 
@@ -213,8 +285,15 @@ paths:
               schema:
                 type: string
                 description: 资源内容的实际访问地址.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources/{resource-id}/state:
     put:
       tags: 
@@ -238,8 +317,19 @@ paths:
       responses:
         '204':
           description: 资源状态更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /resources/{resource-id}/tags:
     put:
       tags: 
@@ -263,8 +353,19 @@ paths:
       responses:
         '204':
           description: 资源标签集更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的资源不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
 components:
   schemas:
     RsrcTagCreatingReq:
@@ -512,6 +613,14 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+  securitySchemes:
+    resourceRepoAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://192.168.0.158:8999/account/genesis/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
   parameters:
     pageNumber:
       name: page
