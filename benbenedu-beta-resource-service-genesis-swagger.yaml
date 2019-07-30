@@ -81,6 +81,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCreatedResp'
+    get:
+      tags: 
+        - Resource
+      summary: 分页获取资源列表.
+      description: 分页获取资源列表.
+      operationId: paginateResources
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSort'
+        - name: tags
+          in: query
+          description: 用于过滤的标签集.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              description: 资源标签ID.
+          style: form
+        - name: states
+          in: query
+          description: 用于过滤的状态集.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              description: 状态.
+          style: form
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePage'
   /resources/{resource-id}:
     get:
       tags: 
@@ -126,6 +163,32 @@ paths:
       responses:
         '204':
           description: 修改成功.
+        '404':
+          description: 指定的资源不存在.
+  /resources/{resource-id}/content:
+    get:
+      tags: 
+        - Resource
+      summary: 获取指定资源的内容.
+      description: 获取指定资源的内容.
+      operationId: getRsrcContentById
+      parameters: 
+        - name: resource-id
+          in: path
+          description: 指定资源的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - type: string
+                  - type: string
+                    format: binary
         '404':
           description: 指定的资源不存在.
   /resources/{resource-id}/content/url:
@@ -256,6 +319,16 @@ components:
           type: string
       required: 
         - id
+    ResourcePage:
+      description: 资源分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Resource'
     ResourcePatch:
       type: object
       description: 资源补丁.
@@ -410,15 +483,57 @@ components:
       required: 
         - id
         - title
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
     ErrorResponse:
       description: 错误响应.
       type: object
       properties:
         code:
-          type: string
-          description: 错误码.
+          $ref: '#/components/schemas/ErrorResponseCode'
         detail:
           type: string
           description: 错误详情.
       required:
         - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undifined
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        type: integer
+        format: int32
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        type: integer
+        format: int32
+    pageSort:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
