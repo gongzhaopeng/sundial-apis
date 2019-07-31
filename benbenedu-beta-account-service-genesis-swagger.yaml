@@ -11,13 +11,323 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/benbenedu-beta/account-service/genesis
+    url: http://192.168.0.158:8999/account/genesis
 tags:
+  - name: Client
+    description: 访问客户端.
   - name: Account
     description: 访问账户.
-paths: {}
+paths:
+  /clients:
+    post:
+      tags: 
+        - Client
+      summary: 创建Client.
+      description: 创建Client.
+      operationId: createClient
+      requestBody:
+        description: 请求创建的Client信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreatingReq'
+      responses:
+        '201':
+          description: 成功创建Client.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - accountCenterAuth: 
+          - client:inner
+  /clients/{client-id}:
+    get:
+      tags: 
+        - Client
+      summary: 获取指定的Client详情.
+      description: 获取指定的Client详情.
+      operationId: getClientById
+      parameters: 
+        - name: client-id
+          in: path
+          description: 指定Client的ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的Client不存在.
+      security:
+        - accountCenterAuth: 
+          - client:inner
+  /accounts:
+    post:
+      tags: 
+        - Account
+      summary: 创建Account.
+      description: 创建Account.
+      operationId: createAccount
+      requestBody:
+        description: 请求创建的Account信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreatingReq'
+      responses:
+        '201':
+          description: 成功创建Client.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - accountCenterAuth: 
+          - client:inner
+  /accounts/{account-id}:
+    get:
+      tags: 
+        - Account
+      summary: 获取指定的Account详情.
+      description: 获取指定的Account详情.
+      operationId: getAccountById
+      parameters: 
+        - name: account-id
+          in: path
+          description: 指定account的ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的Account不存在.
+      security:
+        - accountCenterAuth: 
+          - client:inner
 components:
   schemas:
+    ClientCreatingReq:
+      type: object
+      description: 创建Client的请求信息.
+      properties:
+        ownerId:
+          type: string
+          description: 'The ID of the owner account.'
+        scope:
+          type: array
+          description: "The scope of this client."
+          items:
+            type: string
+        resourceIds:
+          type: array
+          description: "The resources that this client can access."
+          items:
+            type: string
+        authorizedGrantTypes:
+          type: array
+          description: "The grant types for which this client is authorized."
+          items:
+            type: string
+        registeredRedirectUris:
+          type: array
+          description: 'The pre-defined redirect URI for this client to use during the "authorization_code" access grant. See OAuth spec, section 4.1.1.'
+          items:
+            type: string
+        autoApproveScopes:
+          type: array
+          description: "The scopes to auto-approve."
+          items:
+            type: string
+        authorities:
+          type: array
+          description: 'The authorities that are granted to the OAuth client.'
+          items:
+            type: string
+        accessTokenValiditySeconds:
+          type: integer
+          description: 'The access token validity period for this client.'
+          format: int32
+        refreshTokenValiditySeconds:
+          type: integer
+          description: 'The refresh token validity period for this client.'
+          format: int32
+      required: 
+        - ownerId
+        - scope
+        - authorizedGrantTypes
+    ClientCreatedResp:
+      type: object
+      description: Client创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    AccountCreatingReq:
+      type: object
+      description: 创建Account的请求信息.
+      properties:
+        affiliation:
+          $ref: '#/components/schemas/AccountAffiliation'
+        idNumber:
+          type: string
+          description: 身份证号.
+        mobile:
+          type: string
+          description: 手机.
+        email:
+          type: string
+          description: 电子邮箱.
+        password:
+          type: string
+          description: 密码.
+        type:
+          $ref: '#/components/schemas/AccountType'
+        name:
+          type: string
+          description: 名称.
+        nickname:
+          type: string
+          description: 昵称.
+      required: 
+        - password
+        - type
+    AccountCreatedResp:
+      type: object
+      description: Account创建成功时的响应.
+      properties:
+        id:
+          type: string
+      required: 
+        - id
+    Client:
+      type: object
+      description: 客户端.
+      externalDocs: 
+        description: ClientDetails implementation.
+        url: 'https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/BaseClientDetails.java'
+      properties:
+        clientId:
+          type: string
+          description: The client id.
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        creator:
+          $ref: '#/components/schemas/Creator'
+        state:
+          $ref: '#/components/schemas/ClientState'
+        owner:
+          $ref: '#/components/schemas/Owner'
+        clientSecret:
+          type: string
+          description: 'The client secret.'
+        scope:
+          type: array
+          description: "The scope of this client."
+          items:
+            type: string
+        resourceIds:
+          type: array
+          description: "The resources that this client can access."
+          items:
+            type: string
+        authorizedGrantTypes:
+          type: array
+          description: "The grant types for which this client is authorized."
+          items:
+            type: string
+        registeredRedirectUris:
+          type: array
+          description: 'The pre-defined redirect URI for this client to use during the "authorization_code" access grant. See OAuth spec, section 4.1.1.'
+          items:
+            type: string
+        autoApproveScopes:
+          type: array
+          description: "The scopes to auto-approve."
+          items:
+            type: string
+        authorities:
+          type: array
+          description: 'The authorities that are granted to the OAuth client.'
+          items:
+            type: string
+        accessTokenValiditySeconds:
+          type: integer
+          description: 'The access token validity period for this client.'
+          format: int32
+        refreshTokenValiditySeconds:
+          type: integer
+          description: 'The refresh token validity period for this client.'
+          format: int32
+      required: 
+        - clientId
+        - createTime
+        - lUTime
+        - creator
+        - state
+        - owner
+        - clientSecret
+        - scope
+        - authorizedGrantTypes
+    ClientState:
+      type: string
+      description: 客户端状态.
+      enum:
+        - Unactivated
+        - Active
+        - Disabled
+        - Abandoned
+    Owner:
+      type: object
+      description: 客户端拥有者.
+      properties:
+        id:
+          type: string
+          description: 拥有者的账户ID.
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
     Account:
       type: object
       description: 账户.
@@ -33,14 +343,14 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         creator:
-          $ref: '#/components/schemas/AccountCreator'
+          $ref: '#/components/schemas/Creator'
         state:
           $ref: '#/components/schemas/AccountState'
         affiliation:
           $ref: '#/components/schemas/AccountAffiliation'
         idNumber:
           type: string
-          description: 身份标识号. 如身份证号.
+          description: 身份证号.
         mobile:
           type: string
           description: 手机.
@@ -76,7 +386,7 @@ components:
         city:
           type: string
           description: 城市.
-        avator:
+        avatar:
           type: string
           description: 头像URL.
         roles:
@@ -117,7 +427,8 @@ components:
       type: string
       description: 账户角色.
       enum:
-        - NormalUser
+        - Normal
+        - God
         - SuperAdmin
         - Admin
         - QuestionBuilder
@@ -151,9 +462,9 @@ components:
           description: 过期时间点(timestamp).
         refreshToken:
           type: string
-    AccountCreator:
+    Creator:
       type: object
-      description: 账户创建者.
+      description: 创建者.
       properties:
         id:
           type: string
@@ -194,7 +505,8 @@ components:
           type: string
           description: 标题.
         epmSerialNumber:
-          type: string
+          type: integer
+          format: int32
           description: 分配的试卷链编号.
       required:
         - id
@@ -205,10 +517,22 @@ components:
       type: object
       properties:
         code:
-          type: string
-          description: 错误码.
+          $ref: '#/components/schemas/ErrorResponseCode'
         detail:
           type: string
           description: 错误详情.
       required:
         - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
+  securitySchemes:
+    accountCenterAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://192.168.0.158:8999/account/genesis/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
