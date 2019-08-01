@@ -1,0 +1,46 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Mouse Service'
+  description: 'Assessment-Cloud:Mouse-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: http://192.168.0.158:8000/genesis
+tags:
+  - name: OAuth
+    description: OAuth.
+paths:
+  /oauth/hello:
+    get:
+      tags: 
+        - OAuth
+      operationId: hello
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - mouseAuth: 
+          - client:inner
+components:
+  securitySchemes:
+    mouseAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://192.168.0.158:9000/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
