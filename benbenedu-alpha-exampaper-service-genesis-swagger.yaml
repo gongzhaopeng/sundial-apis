@@ -608,11 +608,6 @@ components:
         content:
           type: string
           description: 选项内容.富文本编辑器输出的结果.
-        resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
       required: 
         - number
         - content
@@ -797,11 +792,8 @@ components:
       type: object
       description: 多媒体形式的值.
       properties:
-        mark:
+        resourceId:
           type: string
-          description: 标记.
-        resource:
-          $ref: '#/components/schemas/ResourceBrief'
         mediaType:
           type: string
           externalDocs: 
@@ -821,10 +813,14 @@ components:
       type: object
       properties:
         code:
-          type: string
-          description: 错误码.
+          $ref: '#/components/schemas/ErrorResponseCode'
         detail:
           type: string
           description: 错误详情.
       required:
         - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined

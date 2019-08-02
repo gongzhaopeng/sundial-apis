@@ -1078,11 +1078,8 @@ components:
       type: object
       description: 多媒体形式的值.
       properties:
-        mark:
+        resourceId:
           type: string
-          description: 标记.
-        resource:
-          $ref: '#/components/schemas/ResourceBrief'
         mediaType:
           type: string
           externalDocs: 
@@ -1115,13 +1112,17 @@ components:
       type: object
       properties:
         code:
-          type: string
-          description: 错误码.
+          $ref: '#/components/schemas/ErrorResponseCode'
         detail:
           type: string
           description: 错误详情.
       required:
         - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
   parameters:
     pageNumber:
       name: page
