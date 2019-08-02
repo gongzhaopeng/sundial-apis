@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: http://192.168.0.158:9010/genesis
+    url: http://192.168.0.125:9010/genesis
 tags:
   - name: ResourceTag
     description: 访问资源标签.
