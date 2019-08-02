@@ -12,7 +12,7 @@ info:
 servers:
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: http://192.168.0.158:8999/question/genesis
+    url: http://192.168.0.199:9020/genesis
 tags:
   - name: QTag
     description: 访问题目标签.
@@ -595,6 +595,6 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://192.168.0.158:8999/account/oauth/token"
+          tokenUrl: "http://192.168.0.158:9000/oauth/token"
           scopes:
             'client:inner': 内网客户端
