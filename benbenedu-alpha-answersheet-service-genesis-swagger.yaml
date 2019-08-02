@@ -217,6 +217,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
     AnswerSheetCreatedResp:
       type: object
       description: 答卷创建成功时的响应.
@@ -248,6 +253,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
     QuReplyUpdatingReq:
       type: object
       description: 题目单位作答信息更新请求.
@@ -271,6 +281,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
       required: 
         - questionId
     EpsDetailUpdatingReq:
@@ -290,6 +305,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
     AnswerSheet:
       type: object
       description: 答卷
@@ -325,6 +345,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
       required: 
         - id
         - createTime
@@ -385,6 +410,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
       required: 
         - questionPath
         - questionId
@@ -412,6 +442,11 @@ components:
           description: 扩展的反馈信息集.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+        resources:
+          type: array
+          description: 当前层面用到的资源集.
+          items:
+            $ref: '#/components/schemas/ResourceBrief'
       required: 
         - epsPath
     ResourceBrief:
@@ -433,11 +468,8 @@ components:
       type: object
       description: 多媒体形式的值.
       properties:
-        mark:
+        resourceId:
           type: string
-          description: 标记.
-        resource:
-          $ref: '#/components/schemas/ResourceBrief'
         mediaType:
           type: string
           externalDocs: 
@@ -457,10 +489,14 @@ components:
       type: object
       properties:
         code:
-          type: string
-          description: 错误码.
+          $ref: '#/components/schemas/ErrorResponseCode'
         detail:
           type: string
           description: 错误详情.
       required:
         - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
