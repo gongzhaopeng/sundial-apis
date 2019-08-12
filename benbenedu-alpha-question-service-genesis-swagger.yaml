@@ -551,6 +551,10 @@ components:
             description: wiki
             url: https://en.wikipedia.org/wiki/Media_type
           description: mime.types.
+        contentNumber:
+          type: integer
+          format: int32
+          description: 资源内容的编号.  
         contentUrl:
           type: string
           description: 资源内容的实际访问地址. 此属性仅在外网使用.
