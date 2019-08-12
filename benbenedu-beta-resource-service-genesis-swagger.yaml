@@ -552,7 +552,9 @@ components:
             url: https://en.wikipedia.org/wiki/Media_type
           description: mime.types
         contents:
-          $ref: '#/components/schemas/ResourceContent'
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceContent'
         tags:
           type: array
           description: 标签集.用于管理.
@@ -596,6 +598,9 @@ components:
         width:
           type: integer
           format: int32
+        storageRef:
+          type: string
+          description: The reference to the actual storage.
         url:
           type: string
           description: 资源内容的实际访问地址.
