@@ -230,13 +230,13 @@ paths:
       security:
         - resourceRepoAuth: 
           - client:inner
-  /resources/{resource-id}/content:
+  /resources/{resource-id}/contents/{content-number}:
     get:
       tags: 
         - Resource
-      summary: 获取指定资源的内容.
-      description: 获取指定资源的内容.
-      operationId: getRsrcContentById
+      summary: 获取指定的资源内容.
+      description: 获取指定的资源内容.
+      operationId: getRsrcContentByIdAndNumber
       parameters: 
         - name: resource-id
           in: path
@@ -244,6 +244,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: content-number
+          in: path
+          description: 指定资源内容的编号.
+          required: true
+          schema:
+            type: integer
+            format: int32
       responses:
         '200':
           description: 获取成功.
@@ -259,17 +266,17 @@ paths:
         '403':
           description: Forbidden.
         '404':
-          description: 指定的资源不存在.
+          description: 指定的资源内容不存在.
       security:
         - resourceRepoAuth: 
           - client:inner
-  /resources/{resource-id}/content/url:
+  /resources/{resource-id}/contents/{content-number}/url:
     get:
       tags: 
         - Resource
-      summary: 获取指定资源的内容的实际访问地址.
-      description: 获取指定资源的内容的实际访问地址.
-      operationId: getRsrcContentUrlById
+      summary: 获取指定资源内容的实际访问地址.
+      description: 获取指定资源内容的实际访问地址.
+      operationId: getRsrcContentUrlByIdAndNumber
       parameters: 
         - name: resource-id
           in: path
@@ -277,6 +284,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: content-number
+          in: path
+          description: 指定资源内容的编号.
+          required: true
+          schema:
+            type: integer
+            format: int32
       responses:
         '200':
           description: 获取成功.
@@ -290,7 +304,7 @@ paths:
         '403':
           description: Forbidden.
         '404':
-          description: 指定的资源不存在.
+          description: 指定的资源内容不存在.
       security:
         - resourceRepoAuth: 
           - client:inner
@@ -537,9 +551,8 @@ components:
             description: wiki
             url: https://en.wikipedia.org/wiki/Media_type
           description: mime.types
-        contentUrl:
-          type: string
-          description: 资源内容的实际访问地址.
+        contents:
+          $ref: '#/components/schemas/ResourceContent'
         tags:
           type: array
           description: 标签集.用于管理.
@@ -553,7 +566,42 @@ components:
         - state
         - title
         - mediaType
-        - contentUrl
+        - contents
+    ResourceContent:
+      type: object
+      description: 资源内容.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 编号. 编号为0时指代原始资源内容.
+          minimum: 0
+        quality:
+          type: integer
+          format: int32
+          description: 质量等级.
+          minimum: 1
+          maximum: 10
+        size:
+          type: integer
+          format: int32
+          description: File size in bytes.
+        duration:
+          type: integer
+          format: int32
+          description: The duration.
+        height:
+          type: integer
+          format: int32
+        width:
+          type: integer
+          format: int32
+        url:
+          type: string
+          description: 资源内容的实际访问地址.
+      required: 
+        - number
+        - size
     ResourceState:
       type: string
       description: 资源状态.
