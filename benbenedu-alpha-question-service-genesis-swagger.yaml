@@ -10,7 +10,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 # Added by API Auto Mocking Plugin
 servers:
-# Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: http://192.168.0.199:9020/genesis
 tags:
@@ -98,6 +97,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuestionCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - questionRepoAuth: 
+          - client:inner
+  /questions/query:
+    post:
+      tags: 
+        - Question
+      summary: Query题目.
+      description: Query题目.
+      operationId: queryQuestions
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSort'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionPage'
         '400':
           description: Bad Request.
         '401':
@@ -359,6 +391,83 @@ components:
           type: string
       required: 
         - id
+    QuestionQuery:
+      type: object
+      description: 题目查询描述对象.
+      properties:
+        id: 
+          type: array
+          items:
+            type: string
+          description: 指定id所属的集合. =relation=>in.
+        createTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定createTime所属的区间序列. =relation=>in.
+        lUTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定lUTime所属的区间序列. =relation=>in.
+        author:
+          type: array
+          items:
+            type: string
+          description: 指定author所属的集合. =relation=>in.
+        state:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionState'
+          description: 指定state所属的集合. =relation=>in.
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+        form:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuForm'
+          description: 指定form所属的集合. =relation=>in.
+        stem:
+          $ref: '#/components/schemas/TextSearchSpec'
+        difficulty:
+          type: array
+          items:
+            type: number
+            format: float
+          description: 指定difficulty所属的区间序列. =relation=>in.
+        tags:
+          type: array
+          items:
+            type: string
+          description: 指定tags. =relation=>all.
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+        exclude:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+    QuestionPage:
+      description: 题目分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Question'
     QuestionUpdatingReq:
       type: object
       description: 更新题目的请求信息.
@@ -429,14 +538,7 @@ components:
           type: string
           description: 描述信息,用于管理.
         form:
-          type: string
-          description: 题目单位的形式.
-          enum: 
-            - Choice
-            - MChoice
-            - FillIn
-            - QA
-            - Composite
+          $ref: '#/components/schemas/QuForm'
         stem:
           type: string
           description: 题干.富文本编辑器输出的结果.
@@ -470,6 +572,15 @@ components:
             $ref: '#/components/schemas/ResourceBrief'
       required: 
         - form
+    QuForm:
+      type: string
+      description: 题目单位的形式.
+      enum: 
+        - Choice
+        - MChoice
+        - FillIn
+        - QA
+        - Composite
     QuOption:
       type: object
       description: 可选项.
@@ -578,6 +689,19 @@ components:
       example: 
         mediaType: "text/plain"
         value: "tabu"
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
     ErrorResponse:
       description: 错误响应.
       type: object
@@ -602,3 +726,28 @@ components:
           tokenUrl: "http://192.168.0.158:9000/oauth/token"
           scopes:
             'client:inner': 内网客户端
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        type: integer
+        format: int32
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        type: integer
+        format: int32
+    pageSort:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
