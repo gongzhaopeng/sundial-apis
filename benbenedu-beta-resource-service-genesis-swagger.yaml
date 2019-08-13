@@ -106,49 +106,23 @@ paths:
       security:
         - resourceRepoAuth: 
           - client:inner
-    get:
+  /resources/query:
+    post:
       tags: 
         - Resource
-      summary: 分页获取资源列表.
-      description: 分页获取资源列表.
-      operationId: paginateResources
+      summary: Query资源.
+      description: Query资源.
+      operationId: queryResources
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
         - $ref: '#/components/parameters/pageSort'
-        - name: tags
-          in: query
-          description: 用于过滤的标签集.
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              description: 资源标签ID.
-          style: form
-        - name: states
-          in: query
-          description: 用于过滤的状态集.
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              description: 状态.
-          style: form
-        - name: mediatypes
-          in: query
-          description: 用于过滤的MediaType集.
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              externalDocs: 
-                description: wiki
-                url: https://en.wikipedia.org/wiki/Media_type
-              description: mime.types
-          style: form
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceQuery'
       responses:
         '200':
           description: 获取成功.
@@ -434,6 +408,73 @@ components:
           type: string
       required: 
         - id
+    ResourceQuery:
+      type: object
+      description: 资源查询描述对象.
+      properties:
+        id: 
+          type: array
+          items:
+            type: string
+          description: 指定id所属的集合. =relation=>in.
+        createTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定createTime所属的区间序列. =relation=>in.
+        lUTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定lUTime所属的区间序列. =relation=>in.
+        author:
+          type: array
+          items:
+            type: string
+          description: 指定author所属的集合. =relation=>in.
+        state:
+          type: array
+          items:
+            type: string
+          description: 指定state所属的集合. =relation=>in.
+        title:
+          type: object
+          properties:
+            include:
+              type: array
+              items:
+                type: string
+              description: =relation=>all.
+            exclude:
+              type: array
+              items:
+                type: string
+              description: =relation=>all.
+        description:
+          type: object
+          properties:
+            include:
+              type: array
+              items:
+                type: string
+              description: =relation=>all.
+            exclude:
+              type: array
+              items:
+                type: string
+              description: =relation=>all.
+        mediaType:
+          type: array
+          items:
+            type: string
+          description: 指定mediaType所属的集合. =relation=>in.
+        tags:
+          type: array
+          items:
+            type: string
+          description: 指定tags. =relation=>all.
     ResourcePage:
       description: 资源分页.
       allOf:
