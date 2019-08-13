@@ -437,7 +437,7 @@ components:
         state:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ResourceState'
           description: 指定state所属的集合. =relation=>in.
         title:
           type: object
