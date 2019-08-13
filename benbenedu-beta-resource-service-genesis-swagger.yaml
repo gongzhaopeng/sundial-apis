@@ -440,31 +440,9 @@ components:
             $ref: '#/components/schemas/ResourceState'
           description: 指定state所属的集合. =relation=>in.
         title:
-          type: object
-          properties:
-            include:
-              type: array
-              items:
-                type: string
-              description: =relation=>all.
-            exclude:
-              type: array
-              items:
-                type: string
-              description: =relation=>all.
+          $ref: '#/components/schemas/TextSearchSpec'
         description:
-          type: object
-          properties:
-            include:
-              type: array
-              items:
-                type: string
-              description: =relation=>all.
-            exclude:
-              type: array
-              items:
-                type: string
-              description: =relation=>all.
+          $ref: '#/components/schemas/TextSearchSpec'
         mediaType:
           type: array
           items:
@@ -475,6 +453,20 @@ components:
           items:
             type: string
           description: 指定tags. =relation=>all.
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+        exclude:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
     ResourcePage:
       description: 资源分页.
       allOf:
