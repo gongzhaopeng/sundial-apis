@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: http://192.168.0.158:8000/genesis
+    url: http://192.168.0.158:8080/mouse/genesis
 tags:
   - name: OAuth
     description: OAuth.
@@ -41,6 +41,6 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://192.168.0.158:9000/oauth/token"
+          tokenUrl: "http://192.168.0.158:8080/account/oauth/token"
           scopes:
             'client:inner': 内网客户端
