@@ -11,7 +11,7 @@ info:
 servers:
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/benbenedu-alpha/exampaper-service/genesis
+    url: http://192.168.0.158:8080/exampaper/genesis
 tags:
   - name: EpmTag
     description: 访问试卷模子标签.
@@ -40,6 +40,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EpmTagCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmtags/{epmtag-id}:
     get:
       tags: 
@@ -61,8 +70,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EpmTag'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷模子标签不存在.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmolds:
     post:
       tags:
@@ -83,6 +99,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EpMoldCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmolds/{epmold-id}:
     get:
       tags: 
@@ -104,8 +129,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExamPaperMold'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷模子不存在.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
     put:
       tags:
         - ExamPaperMold
@@ -128,8 +160,19 @@ paths:
       responses:
         '204':
           description: 更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷模子不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmolds/{epmold-id}/state:
     put:
       tags: 
@@ -153,8 +196,19 @@ paths:
       responses:
         '204':
           description: 试卷模子状态更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷模子不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmolds/{epmold-id}/tags:
     put:
       tags: 
@@ -178,8 +232,19 @@ paths:
       responses:
         '204':
           description: 试卷模子标签集更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷模子不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /exampapers:
     post:
       tags: 
@@ -200,6 +265,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExamPaperCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '501':
+          description: Not Implemented.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /exampapers/{exampaper-id}:
     get:
       tags:
@@ -221,8 +297,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExamPaper'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
         '404':
           description: 指定的试卷不存在.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
 components:
   schemas:
     EpmTagCreatingReq:
@@ -423,7 +506,6 @@ components:
           type: string
           description: 指定试卷模子的ID
       required: 
-        - admissionTicket
         - epmId
     ExamPaperCreatedResp:
       type: object
@@ -542,6 +624,10 @@ components:
           description: 标题.
         compositeEpQunit:
           $ref: '#/components/schemas/CompositeEpQuestionUnit'
+        difficulty:
+          type: number
+          format: float
+          description: 题目的难度系数.
       required: 
         - id
         - title
@@ -551,14 +637,7 @@ components:
       description: 可复合的试卷题目单位.
       properties:
         form:
-          type: string
-          description: 题目单位的形式.
-          enum: 
-            - Choice
-            - MChoice
-            - FillIn
-            - QA
-            - Composite
+          $ref: '#/components/schemas/EpQuForm'
         stem:
           type: string
           description: 题干.富文本编辑器输出的结果.
@@ -596,6 +675,15 @@ components:
             $ref: '#/components/schemas/ResourceBrief'
       required: 
         - form
+    EpQuForm:
+      type: string
+      description: 题目单位的形式.
+      enum: 
+        - Choice
+        - MChoice
+        - FillIn
+        - QA
+        - Composite
     EpQuOption:
       type: object
       description: 可选项.
@@ -785,9 +873,45 @@ components:
             description: wiki
             url: https://en.wikipedia.org/wiki/Media_type
           description: mime.types.
-        contentUrl:
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceContentBrief'
+    ResourceContentBrief:
+      type: object
+      description: 资源内容摘要.
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 编号.
+          minimum: 0
+        quality:
+          type: integer
+          format: int32
+          description: 质量等级.
+          minimum: 1
+          maximum: 10
+        size:
+          type: integer
+          format: int32
+          description: File size in bytes.
+        duration:
+          type: integer
+          format: int32
+          description: The duration.
+        height:
+          type: integer
+          format: int32
+        width:
+          type: integer
+          format: int32
+        url:
           type: string
-          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+          description: 资源内容的实际访问地址.
+      required: 
+        - number
+        - size
     MediumValue:
       type: object
       description: 多媒体形式的值.
@@ -808,6 +932,19 @@ components:
       example: 
         mediaType: "text/plain"
         value: "tabu"
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
     ErrorResponse:
       description: 错误响应.
       type: object
@@ -824,3 +961,36 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+  securitySchemes:
+    exampaperRepoAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://192.168.0.158:8080/account/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        type: integer
+        format: int32
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        type: integer
+        format: int32
+    pageSort:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
