@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: http://192.168.0.158:8080/account/genesis
+    url: http://sundial.benbenedu.cn/account/genesis
 tags:
   - name: Client
     description: 访问客户端.
@@ -533,6 +533,6 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://192.168.0.158:8080/account/oauth/token"
+          tokenUrl: "http://sundial.benbenedu.cn/account/oauth/token"
           scopes:
             'client:inner': 内网客户端

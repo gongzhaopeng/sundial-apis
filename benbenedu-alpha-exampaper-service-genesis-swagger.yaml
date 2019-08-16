@@ -11,7 +11,7 @@ info:
 servers:
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: http://192.168.0.158:8080/exampaper/genesis
+    url: http://sundial.benbenedu.cn/exampaper/genesis
 tags:
   - name: EpmTag
     description: 访问试卷模子标签.
@@ -966,7 +966,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://192.168.0.158:8080/account/oauth/token"
+          tokenUrl: "http://sundial.benbenedu.cn/account/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:
