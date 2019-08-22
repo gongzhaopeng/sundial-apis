@@ -15,8 +15,8 @@ servers:
 tags:
   - name: ExamStation
     description: 访问考试站.
-  - name: Delivery
-    description: 访问递送信息.
+  - name: ExamPaperDelivery
+    description: 访问试卷递送信息.
 paths:
   /examstations:
     post:
@@ -181,7 +181,35 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
-  # /deliveries/for/exampaper/:
+  /epdeliveries:
+    post:
+      tags:
+        - ExamPaperDelivery
+      summary: 提交试卷递送任务.
+      description: 提交试卷递送任务.
+      operationId: submitExamPaperDelivery
+      requestBody:
+        description: 提交的试卷递送任务信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpDeliveryDefinition'
+      responses:
+        '201':
+          description: 提交成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpDeliveryTaskCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
 components:
   schemas:
     ExamStationDefinition:
@@ -312,6 +340,29 @@ components:
       required: 
         - examstationLUTime
         - newState
+    EpDeliveryDefinition:
+      type: object
+      description: 提交试卷递送任务的请求信息.
+      properties:
+        description:
+          type: string
+          description: 描述.
+        exampaper:
+          $ref: '#/components/schemas/ExampaperBrief'
+        examStation:
+          $ref: '#/components/schemas/ExamStationBrief'
+        autoPerform:
+          type: boolean
+          description: 是否自动执行.
+      required:
+        - exampaper
+        - examStation
+    EpDeliveryTaskCreatedResp:
+      type: object
+      description: 试卷递送任务提交成功时的响应.
+      properties:
+        id:
+          type: string
     ExamStation:
       type: object
       description: 考试站.
@@ -420,10 +471,10 @@ components:
         description:
           type: string
           description: 描述.
-        # exampaper:
-        #   $ref: '#/components/schemas/ExampaperBrief'
-        # examStation:
-        #   $ref: '#/components/schemas/ExamStationBrief'
+        exampaper:
+          $ref: '#/components/schemas/ExampaperBrief'
+        examStation:
+          $ref: '#/components/schemas/ExamStationBrief'
         lBeginTime:
           type: integer
           format: int64
@@ -453,6 +504,37 @@ components:
         - Active
         - Inactive
         - Deleted
+    ExampaperBrief:
+      type: object
+      description: 试卷的简单信息.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          description: 标题.
+        mark:
+          type: string
+          description: 标记.
+      required: 
+        - id
+        - title
+    ExamStationBrief:
+      type: object
+      description: 考试站的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: 名称.
+        type:
+          $ref: '#/components/schemas/ExamStationType'
+        host:
+          type: string
+          description: Host.
+          example: 
+            api.openeva.com:9000
     DeliveryTaskPerformingState:
       type: string
       description: 递送任务的执行状态.
