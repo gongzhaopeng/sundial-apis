@@ -505,6 +505,9 @@ components:
         epmId:
           type: string
           description: 指定试卷模子的ID
+        mark:
+          type: string
+          description: 标记.
       required: 
         - epmId
     ExamPaperCreatedResp:
@@ -769,6 +772,9 @@ components:
         epmId:
           type: string
           description: 对应的试卷模子的ID
+        mark:
+          type: string
+          description: 标记.
         title:
           type: string
           description: 标题.
