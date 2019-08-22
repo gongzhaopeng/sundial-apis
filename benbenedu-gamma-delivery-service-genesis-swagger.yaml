@@ -210,6 +210,105 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /epdeliveries/query:
+    post:
+      tags: 
+        - ExamPaperDelivery
+      summary: Query试卷递送任务.
+      description: Query试卷递送任务.
+      operationId: queryEpDeliveryTasks
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSort'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpDeliveryTaskQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpDeliveryTaskPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epdeliveries/{epdeliverie-id}:
+    get:
+      tags: 
+        - ExamPaperDelivery
+      summary: 获取指定的试卷递送任务.
+      description: 获取指定的试卷递送任务.
+      operationId: getEpDeliveryTaskById
+      parameters: 
+        - name: epdeliverie-id
+          in: path
+          description: 指定试卷递送任务的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExampaperDeliveryTask'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的试卷递送任务不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epdeliveries/{epdeliverie-id}/state:
+    put:
+      tags: 
+        - ExamPaperDelivery
+      summary: 更新指定试卷递送任务的状态.
+      description: 更新指定试卷递送任务的状态.
+      operationId: updateEpDeliveryTaskStateById
+      parameters: 
+        - name: epdeliverie-id
+          in: path
+          description: 指定试卷递送任务的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 试卷递送任务状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryTaskStateUpdatingReq'
+      responses:
+        '204':
+          description: 试卷递送任务状态更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的试卷递送任务不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - questionRepoAuth: 
+          - client:inner
 components:
   schemas:
     ExamStationDefinition:
@@ -290,20 +389,6 @@ components:
           items:
             $ref: '#/components/schemas/ResourceEngineProvider'
           description: 指定resourceEngineProvider所属的集合. =relation=>in.
-    TextSearchSpec:
-      type: object
-      description: 文本搜索描述对象.
-      properties:
-        include:
-          type: array
-          items:
-            type: string
-          description: =relation=>all.
-        exclude:
-          type: array
-          items:
-            type: string
-          description: =relation=>all.
     ExamStationPage:
       description: 考试站分页.
       allOf:
@@ -363,6 +448,90 @@ components:
       properties:
         id:
           type: string
+    EpDeliveryTaskQuery:
+      type: object
+      description: 试卷递送任务查询描述对象.
+      properties:
+        id: 
+          type: array
+          items:
+            type: string
+          description: 指定id所属的集合. =relation=>in.
+        createTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定createTime所属的区间序列. =relation=>in.
+        lUTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定lUTime所属的区间序列. =relation=>in.
+        creator:
+          type: array
+          items:
+            type: string
+          description: 指定author所属的集合. =relation=>in.
+        state:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskState'
+          description: 指定state所属的集合. =relation=>in.
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+        exampaperId:
+          type: array
+          items:
+            type: string
+          description: 指定exampaperId所属的集合. =relation=>in.
+        exampaperTitle:
+          $ref: '#/components/schemas/TextSearchSpec'
+        exampaperMark:
+          $ref: '#/components/schemas/TextSearchSpec'
+        examStationId:
+          type: array
+          items:
+            type: string
+          description: 指定examStationId所属的集合. =relation=>in.
+        examStationName:
+          $ref: '#/components/schemas/TextSearchSpec'
+        examStationType:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExamStationType'
+          description: 指定examStationType所属的集合. =relation=>in.
+        examStationHost:
+          $ref: '#/components/schemas/TextSearchSpec'
+        performingState:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskPerformingState'
+          description: 指定performingState所属的集合. =relation=>in.
+    EpDeliveryTaskPage:
+      description: 试卷递送任务分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExampaperDeliveryTask'
+    DeliveryTaskStateUpdatingReq:
+      type: object
+      description: 更新递送任务状态的请求信息.
+      properties:
+        deliveryTaskLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/DeliveryTaskState'
+      required: 
+        - deliveryTaskLUTime
+        - newState
     ExamStation:
       type: object
       description: 考试站.
@@ -464,6 +633,10 @@ components:
           type: integer
           format: int64
           description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
         creator:
           $ref: '#/components/schemas/AccountBrief'
         state:
@@ -493,6 +666,7 @@ components:
       required: 
         - id
         - createTime
+        - lUTime
         - creator
         - state
         - exampaper
@@ -555,6 +729,20 @@ components:
           type: string
       required: 
         - id
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+        exclude:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
     BasicPage:
       type: object
       description: 分页基本信息.
