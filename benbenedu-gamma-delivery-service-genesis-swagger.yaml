@@ -1,0 +1,537 @@
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Delivery Service API'
+  description: 'Assessment-Cloud:Delivery-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: http://sundial.benbenedu.cn/delivery/genesis
+tags:
+  - name: ExamStation
+    description: 访问考试站.
+  - name: Delivery
+    description: 访问递送信息.
+paths:
+  /examstations:
+    post:
+      tags: 
+        - ExamStation
+      summary: 创建考试站.
+      description: 创建考试站.
+      operationId: createExamStation
+      requestBody:
+        description: 请求创建的考试站信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamStationDefinition'
+      responses:
+        '201':
+          description: 成功创建考试站.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamStationCreatedResp'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /examstations/query:
+    post:
+      tags: 
+        - ExamStation
+      summary: Query考试站.
+      description: Query考试站.
+      operationId: queryExamStations
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSort'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamStationQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamStationPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /examstations/{examstation-id}:
+    get:
+      tags: 
+        - ExamStation
+      summary: 获取指定的考试站详情.
+      description: 获取指定的考试站详情.
+      operationId: getExamStationById
+      parameters: 
+        - name: examstation-id
+          in: path
+          description: 指定考试站的ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamStation'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试站不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
+    put:
+      tags:
+        - ExamStation
+      summary: 更新指定考试站的信息.
+      description: 更新指定考试站的信息.
+      operationId: updateExamStationById
+      parameters: 
+        - name: examstation-id
+          in: path
+          description: 指定考试站的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 请求更新的考试站信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamStationUpdatingReq'
+      responses:
+        '204':
+          description: 更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试站不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /examstations/{examstation-id}/state:
+    put:
+      tags: 
+        - ExamStation
+      summary: 更新指定考试站的状态.
+      description: 更新指定考试站的状态.
+      operationId: updateExamStationStateById
+      parameters: 
+        - name: examstation-id
+          in: path
+          description: 指定考试站的ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 考试站状态更新请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamStationStateUpdatingReq'
+      responses:
+        '204':
+          description: 考试站状态更新成功.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试站不存在.
+        '428':
+          description: Precondition Required.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  # /deliveries/for/exampaper/:
+components:
+  schemas:
+    ExamStationDefinition:
+      type: object
+      description: 创建考试站的请求信息.
+      properties:
+        name:
+          type: string
+          description: 名称.
+        description:
+          type: string
+          description: 描述.
+        type:
+          $ref: '#/components/schemas/ExamStationType'
+        host:
+          type: string
+          description: Host.
+          example: 
+            api.openeva.com:9000
+        resourceEngine:
+          $ref: '#/components/schemas/ResourceEngine'
+      required: 
+        - state
+        - name
+        - type
+        - host
+        - resourceEngine
+    ExamStationCreatedResp:
+      type: object
+      description: 考试站创建成功时的响应.
+      properties:
+        id:
+          type: string
+    ExamStationQuery:
+      type: object
+      description: 考试站查询描述对象.
+      properties:
+        id: 
+          type: array
+          items:
+            type: string
+          description: 指定id所属的集合. =relation=>in.
+        createTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定createTime所属的区间序列. =relation=>in.
+        lUTime:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 指定lUTime所属的区间序列. =relation=>in.
+        creator:
+          type: array
+          items:
+            type: string
+          description: 指定creator所属的集合. =relation=>in.
+        state:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExamStationState'
+          description: 指定state所属的集合. =relation=>in.
+        name:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+        type:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExamStationType'
+          description: 指定type所属的集合. =relation=>in.
+        host:
+          $ref: '#/components/schemas/TextSearchSpec'
+        resourceEngineProvider:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceEngineProvider'
+          description: 指定resourceEngineProvider所属的集合. =relation=>in.
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+        exclude:
+          type: array
+          items:
+            type: string
+          description: =relation=>all.
+    ExamStationPage:
+      description: 考试站分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExamStation'
+    ExamStationUpdatingReq:
+      type: object
+      description: 更新考试站的请求信息.
+      properties:
+        examstationLUTime: 
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newDefinition:
+          $ref: '#/components/schemas/ExamStationDefinition'
+      required: 
+        - examstationLUTime
+        - newDefinition
+    ExamStationStateUpdatingReq:
+      type: object
+      description: 更新考试站状态的请求信息.
+      properties:
+        examstationLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        newState:
+          $ref: '#/components/schemas/ExamStationState'
+      required: 
+        - examstationLUTime
+        - newState
+    ExamStation:
+      type: object
+      description: 考试站.
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+        state:
+          $ref: '#/components/schemas/ExamStationState'
+        name:
+          type: string
+          description: 名称.
+        description:
+          type: string
+          description: 描述.
+        type:
+          $ref: '#/components/schemas/ExamStationType'
+        host:
+          type: string
+          description: Host.
+          example: 
+            api.openeva.com:9000
+        resourceEngine:
+          $ref: '#/components/schemas/ResourceEngine'
+      required: 
+        - id
+        - createTime
+        - lUTime
+        - creator
+        - state
+        - name
+        - type
+        - host
+        - resourceEngine
+    ExamStationState:
+      type: string
+      description: 考试站状态.
+      enum: 
+        - Building
+        - Operative
+        - Suspended
+        - Destroyed
+    ExamStationType:
+      type: string
+      description: 考试站类型.
+      enum: 
+        - OpenEva
+    ResourceEngine:
+      type: object
+      description: 资源引擎.
+      properties:
+        provider:
+          $ref: '#/components/schemas/ResourceEngineProvider'
+        aliyunOss:
+          $ref: '#/components/schemas/AliyunOssConfig'
+      required: 
+        - provider
+    ResourceEngineProvider:
+      type: string
+      description: 资源引擎供应商.
+      enum:
+        - AliyunOss
+    AliyunOssConfig:
+      type: object
+      description: Aliyun OSS configuration.
+      properties:
+        endpoint:
+          type: string
+        bucket:
+          type: string
+        accessKeyId:
+          type: string
+        accessKeySecret:
+          type: string
+        path:
+          type: string
+      required: 
+        - endpoint
+        - bucket
+        - accessKeyId
+        - accessKeySecret
+        - path
+    ExampaperDeliveryTask:
+      type: object
+      description: 试卷递送任务. 
+      properties:
+        id:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+        state:
+          $ref: '#/components/schemas/DeliveryTaskState'
+        description:
+          type: string
+          description: 描述.
+        # exampaper:
+        #   $ref: '#/components/schemas/ExampaperBrief'
+        # examStation:
+        #   $ref: '#/components/schemas/ExamStationBrief'
+        lBeginTime:
+          type: integer
+          format: int64
+          description: 最近一次执行的开始时间(timestamp).
+        lFinishTime:
+          type: integer
+          format: int64
+          description: 最近一次执行的结束时间(timestamp).
+        performingState:
+          $ref: '#/components/schemas/DeliveryTaskPerformingState'
+        performingLogs:
+          type: array
+          items:
+            type: string
+          description: 执行logs.
+      required: 
+        - id
+        - createTime
+        - creator
+        - state
+        - exampaper
+        - examStation
+    DeliveryTaskState:
+      type: string
+      description: 递送任务的状态.
+      enum: 
+        - Active
+        - Inactive
+        - Deleted
+    DeliveryTaskPerformingState:
+      type: string
+      description: 递送任务的执行状态.
+      enum: 
+        - New
+        - Performing
+        - Error
+        - Completed
+    AccountBrief:
+      type: object
+      description: 账户的简单信息.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorResponseCode'
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
+  securitySchemes:
+    deliveryAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://sundial.benbenedu.cn/account/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        type: integer
+        format: int32
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        type: integer
+        format: int32
+    pageSort:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
