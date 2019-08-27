@@ -889,9 +889,11 @@ components:
         type: array
         items:
           type: string
+          minLength: 1
           maxLength: 50
         default: 
           - 'createTime,desc'
+        minLength: 1
         maxLength: 5
       style: form
       explode: true
@@ -903,9 +905,11 @@ components:
         type: array
         items:
           type: string
+          minLength: 1
           maxLength: 50
         default: 
           - 'lUTime,desc'
+        minLength: 1
         maxLength: 5
       style: form
       explode: true
