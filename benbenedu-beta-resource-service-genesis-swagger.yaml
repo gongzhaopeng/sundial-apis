@@ -47,6 +47,39 @@ paths:
       security:
         - resourceRepoAuth: 
           - client:inner
+  /rsrctags/query:
+    post:
+      tags: 
+        - ResourceTag
+      summary: Query资源标签.
+      description: Query资源标签.
+      operationId: queryRsrctags
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultCreateTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RsrcTagQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsrcTagPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - resourceRepoAuth: 
+          - client:inner
   /rsrctags/{rsrctag-id}:
     get:
       tags: 
@@ -60,7 +93,7 @@ paths:
           description: 指定rsrctag的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -82,7 +115,7 @@ paths:
       tags: 
         - Resource
       summary: 创建资源.
-      description: 创建资源.
+      description: 创建资源. 新创建资源的初始状态为Developing.
       operationId: createResource
       requestBody:
         description: 请求创建的资源信息.
@@ -116,7 +149,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
-        - $ref: '#/components/parameters/pageSort'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
       requestBody:
         description: 查询描述.
         content:
@@ -152,7 +185,7 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -181,7 +214,7 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 欲修改的信息.
         content:
@@ -201,6 +234,20 @@ paths:
           description: 指定的资源不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                alteringNotAllowed:
+                  value:
+                    code: 'AlteringNotAllowed'
+                    detail: '${detail}'
+                  description: '更改仅在Developing状态下被允许.'
       security:
         - resourceRepoAuth: 
           - client:inner
@@ -217,14 +264,13 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
         - name: content-number
           in: path
           description: 指定资源内容的编号.
           required: true
           schema:
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/ResourceContentNumber'
       responses:
         '200':
           description: 获取成功.
@@ -257,14 +303,13 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
         - name: content-number
           in: path
           description: 指定资源内容的编号.
           required: true
           schema:
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/ResourceContentNumber'
       responses:
         '200':
           description: 获取成功.
@@ -295,7 +340,7 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 资源状态更新请求信息.
         content:
@@ -315,6 +360,20 @@ paths:
           description: 指定的资源不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                specifiedStateConversionNotAllowed:
+                  value:
+                    code: 'SpecifiedStateConversionNotAllowed'
+                    detail: '${detail}'
+                  description: '允许的状态转换路径: Developing->Usable->Discarded'
       security:
         - resourceRepoAuth: 
           - client:inner
@@ -331,7 +390,7 @@ paths:
           description: 指定资源的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 资源标签集更新请求信息.
         content:
@@ -351,6 +410,15 @@ paths:
           description: 指定的资源不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
       security:
         - resourceRepoAuth: 
           - client:inner
@@ -361,11 +429,9 @@ components:
       description: 创建资源标签的请求信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/RsrcTagTitle'
         description:
-          type: string
-          description: 描述信息.
+          $ref: '#/components/schemas/MgmtDescriptionField'
       required: 
         - title
     RsrcTagCreatedResp:
@@ -373,29 +439,45 @@ components:
       description: 资源标签创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
+    RsrcTagQuery:
+      type: object
+      description: 资源标签查询描述对象.
+      properties:
+        id: 
+          $ref: '#/components/schemas/IdQueryField'
+        createTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        author:
+          $ref: '#/components/schemas/IdQueryField'
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+    RsrcTagPage:
+      description: 资源标签分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/RsrcTag'
     ResourceCreatingReq:
       type: object
       description: 创建资源的请求信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/ResourceTitle'
         description:
-          type: string
-          description: 描述信息, 用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types
+          $ref: '#/components/schemas/MediaTypeField'
         content:
-          type: string
-          format: binary
-          description: 资源内容.
+          $ref: '#/components/schemas/ResourceRawContent'
       required:
         - title
         - mediaType
@@ -405,7 +487,7 @@ components:
       description: 资源创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
     ResourceQuery:
@@ -413,32 +495,20 @@ components:
       description: 资源查询描述对象.
       properties:
         id: 
-          type: array
-          items:
-            type: string
-          description: 指定id所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         createTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定createTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         lUTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定lUTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         author:
-          type: array
-          items:
-            type: string
-          description: 指定author所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         state:
           type: array
           items:
             $ref: '#/components/schemas/ResourceState'
           description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -446,13 +516,27 @@ components:
         mediaType:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/MediaTypeField'
           description: 指定mediaType所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 50
         tags:
-          type: array
-          items:
-            type: string
-          description: 指定tags. =relation=>all.
+          $ref: '#/components/schemas/IdQueryField'
+    IdQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定id所属的集合. =relation=>in.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
     TextSearchSpec:
       type: object
       description: 文本搜索描述对象.
@@ -461,12 +545,20 @@ components:
           type: array
           items:
             type: string
+            minLength: 1
+            maxLength: 25
           description: =relation=>all.
+          minLength: 1
+          maxLength: 10
         exclude:
           type: array
           items:
             type: string
+            minLength: 1
+            maxLength: 25
           description: =relation=>all.
+          minLength: 1
+          maxLength: 10
     ResourcePage:
       description: 资源分页.
       allOf:
@@ -486,21 +578,13 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/ResourceTitle'
         description:
-          type: string
-          description: 描述信息, 用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types
+          $ref: '#/components/schemas/MediaTypeField'
         content:
-          type: string
-          format: binary
-          description: 资源内容.
+          $ref: '#/components/schemas/ResourceRawContent'
     RsrcStateUpdatingReq:
       type: object
       description: 更新资源状态的请求信息.
@@ -524,10 +608,11 @@ components:
           description: 最近一次更新时间(timestamp).
         newTags:
           type: array
-          description: 新的标签集.
+          description: 新的标签集. 该数组长度为0时表示清除所有标签.
           items:
-            type: string
-            description: 资源标签的ID.
+            $ref: '#/components/schemas/ObjectID'
+          minLength: 0
+          maxLength: 50
       required: 
         - rsrcLUTime
         - newTags
@@ -536,7 +621,7 @@ components:
       description: 资源标签.用于资源管理.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -544,22 +629,26 @@ components:
         author:
           $ref: '#/components/schemas/AuthorBrief'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/RsrcTagTitle'
         description:
-          type: string
-          description: 描述信息.
+          $ref: '#/components/schemas/MgmtDescriptionField'
       required: 
         - id
         - createTime
         - author
         - title
+    ResourceRawContent:
+      type: string
+      format: binary
+      description: 资源的原始内容.
+      minLength: 1
+      maxLength: 134217728
     Resource:
       type: object
       description: 资源.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -573,21 +662,16 @@ components:
         state:
           $ref: '#/components/schemas/ResourceState'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/ResourceTitle'
         description:
-          type: string
-          description: 描述信息, 用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types
+          $ref: '#/components/schemas/MediaTypeField'
         contents:
           type: array
           items:
             $ref: '#/components/schemas/ResourceContent'
+          description: 编号为0的ResourceContent为原始资源内容. 该数组中各个ResourceContent间编号不能重复.
         tags:
           type: array
           description: 标签集.用于管理.
@@ -602,21 +686,19 @@ components:
         - title
         - mediaType
         - contents
+    ResourceTitle:
+      type: string
+      description: 资源标题.
+      minLength: 1
+      maxLength: 50
     ResourceContent:
       type: object
       description: 资源内容.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 编号. 编号为0时指代原始资源内容.
-          minimum: 0
+          $ref: '#/components/schemas/ResourceContentNumber'
         quality:
-          type: integer
-          format: int32
-          description: 质量等级.
-          minimum: 1
-          maximum: 10
+          $ref: '#/components/schemas/ResourceContentQuality'
         size:
           type: integer
           format: int32
@@ -640,6 +722,17 @@ components:
       required: 
         - number
         - size
+    ResourceContentNumber:
+      type: integer
+      format: int32
+      description: 资源内容的编号.
+      minimum: 0
+    ResourceContentQuality:
+      type: integer
+      format: int32
+      description: 质量等级.
+      minimum: 1
+      maximum: 10
     ResourceState:
       type: string
       description: 资源状态.
@@ -647,12 +740,14 @@ components:
         - Developing
         - Usable
         - Discarded
+      minLength: 1
+      maxLength: 50
     AuthorBrief:
       type: object
       description: 作者的简单信息.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         name:
           type: string
         nickname:
@@ -664,12 +759,35 @@ components:
       description: 资源标签的简单形式.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         title:
-          type: string
+          $ref: '#/components/schemas/RsrcTagTitle'
       required: 
         - id
         - title
+    RsrcTagTitle:
+      type: string
+      description: 不可重复.
+      minLength: 1
+      maxLength: 25
+    MgmtDescriptionField:
+      type: string
+      description: 用于管理的描述信息.
+      minLength: 1
+      maxLength: 250
+    MediaTypeField:
+      type: string
+      externalDocs: 
+        description: wiki
+        url: https://en.wikipedia.org/wiki/Media_type
+      description: mime.types
+      minLength: 1
+      maxLength: 100
+    ObjectID:
+      type: string
+      description: MongoDB:ObjectId
+      minLength: 24
+      maxLength: 24
     BasicPage:
       type: object
       description: 分页基本信息.
@@ -699,6 +817,9 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
   securitySchemes:
     resourceRepoAuth:
       type: oauth2
@@ -715,6 +836,8 @@ components:
       schema:
         type: integer
         format: int32
+        minimum: 0
+        default: 0
     pageSize:
       name: size
       in: query
@@ -722,7 +845,9 @@ components:
       schema:
         type: integer
         format: int32
-    pageSort:
+        minimum: 1
+        default: 10
+    pageSortWithDefaultCreateTimeDesc:
       name: sort
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
@@ -730,5 +855,23 @@ components:
         type: array
         items:
           type: string
+          maxLength: 50
+        default: 
+          - 'createTime,desc'
+        maxLength: 5
+      style: form
+      explode: true
+    pageSortWithDefaultLUTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 50
+        default: 
+          - 'lUTime,desc'
+        maxLength: 5
       style: form
       explode: true
