@@ -44,6 +44,50 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
+      security:
+        - questionRepoAuth: 
+          - client:inner
+  /qtags/query:
+    post:
+      tags: 
+        - QTag
+      summary: Query题目标签.
+      description: Query题目标签.
+      operationId: queryQTags
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultCreateTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QTagQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QTagPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
       security:
         - questionRepoAuth: 
           - client:inner
@@ -60,7 +104,7 @@ paths:
           description: 指定qtag的ID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -103,6 +147,17 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -116,7 +171,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
-        - $ref: '#/components/parameters/pageSort'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
       requestBody:
         description: 查询描述.
         content:
@@ -152,7 +207,7 @@ paths:
           description: 指定题目的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -181,7 +236,7 @@ paths:
           description: 指定题目的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 请求更新的题目设计信息.
         content:
@@ -199,8 +254,33 @@ paths:
           description: Forbidden.
         '404':
           description: 指定的题目不存在.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                alteringNotAllowed:
+                  value:
+                    code: 'AlteringNotAllowed'
+                    detail: '${detail}'
+                  description: '更改仅在Developing状态下被允许.'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -217,7 +297,7 @@ paths:
           description: 指定题目的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 题目状态更新请求信息.
         content:
@@ -237,6 +317,20 @@ paths:
           description: 指定的题目不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                specifiedStateConversionNotAllowed:
+                  value:
+                    code: 'SpecifiedStateConversionNotAllowed'
+                    detail: '${detail}'
+                  description: '允许的状态转换路径: Developing->Usable->Discarded'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -253,7 +347,7 @@ paths:
           description: 指定题目的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 题目标签集更新请求信息.
         content:
@@ -273,6 +367,15 @@ paths:
           description: 指定的题目不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -283,11 +386,9 @@ components:
       description: 创建题目标签的请求信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/QTagTitle'
         description:
-          type: string
-          description: 描述信息.
+          $ref: '#/components/schemas/MgmtDescriptionField'
       required: 
         - title
     QTagCreatedResp:
@@ -295,15 +396,39 @@ components:
       description: 题目标签创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
+    QTagQuery:
+      type: object
+      description: 题目标签查询描述对象.
+      properties:
+        id: 
+          $ref: '#/components/schemas/IdQueryField'
+        createTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        author:
+          $ref: '#/components/schemas/IdQueryField'
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+    QTagPage:
+      description: 题目标签分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/QTag'
     QTag:
       type: object
       description: 题目标签.用于题目管理.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -311,11 +436,9 @@ components:
         author:
           $ref: '#/components/schemas/AuthorBrief'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/QTagTitle'
         description:
-          type: string
-          description: 描述信息.
+          $ref: '#/components/schemas/MgmtDescriptionField'
       required: 
         - id
         - createTime
@@ -326,61 +449,14 @@ components:
       description: 题目的设计信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/QuestionTitle'
         description:
-          type: string
-          description: 描述信息, 用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         compositeQunit:
           $ref: '#/components/schemas/CompositeQuestionUnit'
         difficulty:
-          type: number
-          format: float
-          description: 题目的难度系数.
+          $ref: '#/components/schemas/QuestionDifficulty'
       required: 
-        - title
-        - compositeQunit
-    Question:
-      type: object
-      description: 题目.
-      properties:
-        id:
-          type: string
-        createTime:
-          type: integer
-          format: int64
-          description: 创建时间(timestamp).
-        lUTime:
-          type: integer
-          format: int64
-          description: 最近一次更新时间(timestamp).
-        author:
-          $ref: '#/components/schemas/AuthorBrief'
-        state:
-          $ref: '#/components/schemas/QuestionState'
-        title:
-          type: string
-          description: 标题.
-        description:
-          type: string
-          description: 描述信息, 用于管理.
-        compositeQunit:
-          $ref: '#/components/schemas/CompositeQuestionUnit'
-        difficulty:
-          type: number
-          format: float
-          description: 题目的难度系数.
-        tags:
-          type: array
-          description: 标签集.用于管理.
-          items:
-            $ref: '#/components/schemas/QTagBrief'
-      required: 
-        - id
-        - createTime
-        - lUTime
-        - author
-        - state
         - title
         - compositeQunit
     QuestionCreatedResp:
@@ -388,7 +464,7 @@ components:
       description: 题目创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
     QuestionQuery:
@@ -396,32 +472,20 @@ components:
       description: 题目查询描述对象.
       properties:
         id: 
-          type: array
-          items:
-            type: string
-          description: 指定id所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         createTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定createTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         lUTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定lUTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         author:
-          type: array
-          items:
-            type: string
-          description: 指定author所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         state:
           type: array
           items:
             $ref: '#/components/schemas/QuestionState'
           description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -431,33 +495,19 @@ components:
           items:
             $ref: '#/components/schemas/QuForm'
           description: 指定form所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         stem:
           $ref: '#/components/schemas/TextSearchSpec'
         difficulty:
           type: array
           items:
-            type: number
-            format: float
-          description: 指定difficulty所属的区间序列. =relation=>in.
+            $ref: '#/components/schemas/QuestionDifficulty'
+          description: 指定difficulty所属的区间序列. =relation=>in. 数组长度必须为偶数.
+          minLength: 2
+          maxLength: 20
         tags:
-          type: array
-          items:
-            type: string
-          description: 指定tags. =relation=>all.
-    TextSearchSpec:
-      type: object
-      description: 文本搜索描述对象.
-      properties:
-        include:
-          type: array
-          items:
-            type: string
-          description: =relation=>all.
-        exclude:
-          type: array
-          items:
-            type: string
-          description: =relation=>all.
+          $ref: '#/components/schemas/IdQueryField'
     QuestionPage:
       description: 题目分页.
       allOf:
@@ -504,25 +554,53 @@ components:
           description: 最近一次更新时间(timestamp).
         newTags:
           type: array
-          description: 新的标签集.
+          description: 新的标签集. 该数组长度为0时表示清除所有标签.
           items:
-            type: string
-            description: 题目标签的ID.
+            $ref: '#/components/schemas/ObjectID'
+          minLength: 0
+          maxLength: 50
       required: 
         - questionLUTime
         - newTags
-    AuthorBrief:
+    Question:
       type: object
-      description: 作者的简单信息.
+      description: 题目.
       properties:
         id:
-          type: string
-        name:
-          type: string
-        nickname:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/QuestionState'
+        title:
+          $ref: '#/components/schemas/QuestionTitle'
+        description:
+          $ref: '#/components/schemas/MgmtDescriptionField'
+        compositeQunit:
+          $ref: '#/components/schemas/CompositeQuestionUnit'
+        difficulty:
+          $ref: '#/components/schemas/QuestionDifficulty'
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/QTagBrief'
       required: 
         - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - compositeQunit
     QuestionState:
       type: string
       description: 题目状态.
@@ -530,24 +608,34 @@ components:
         - Developing
         - Usable
         - Discarded
+      minLength: 1
+      maxLength: 50
+    QuestionTitle:
+      type: string
+      description: 题目标题.
+      minLength: 1
+      maxLength: 200
+    QuestionDifficulty:
+      type: number
+      format: float
+      description: 题目的难度系数.
     CompositeQuestionUnit:
       type: object
       description: 可复合的题目单位.
       properties:
         description:
-          type: string
-          description: 描述信息,用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         form:
           $ref: '#/components/schemas/QuForm'
         stem:
-          type: string
-          description: 题干.富文本编辑器输出的结果.
-            资源由客户端上传至资源服务器(建议添加资源浏览功能).
+          $ref: '#/components/schemas/RichTextContentField'
         options:
           type: array
           description: 可选项集.仅当形式为选择题时出现.
           items:
             $ref: '#/components/schemas/QuOption'
+          minLength: 1
+          maxLength: 20
         answerMatchStrategy:
           $ref: '#/components/schemas/AnswerMatchStrategy'
         stdAnswers:
@@ -555,21 +643,29 @@ components:
           description: 标准答案集.
           items:
             $ref: '#/components/schemas/StdAnswer'
+          minLength: 1
+          maxLength: 20
         subQunits:
           type: array
           description: 下属的题目单位集.
           items:
             $ref: '#/components/schemas/CompositeQuestionUnit'
+          minLength: 1
+          maxLength: 20
         extFeatures:
           type: object
           description: 扩展的特征集,有业务含义.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+          minLength: 1
+          maxLength: 20
         resources:
           type: array
           description: 当前层面用到的资源集.
           items:
             $ref: '#/components/schemas/ResourceBrief'
+          minLength: 1
+          maxLength: 50
       required: 
         - form
     QuForm:
@@ -581,18 +677,16 @@ components:
         - FillIn
         - QA
         - Composite
+      minLength: 1
+      maxLength: 50
     QuOption:
       type: object
       description: 可选项.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 选项编号.
-          minimum: 1
+          $ref: '#/components/schemas/NumberField'
         content:
-          type: string
-          description: 选项内容.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/RichTextContentField'
       required: 
         - number
         - content
@@ -606,11 +700,17 @@ components:
           enum: 
             - OrderSensitiveEqual
             - OrderInsensitiveEqual
+          minLength: 1
+          maxLength: 50
         metadata:
           type: object
           description: 策略元数据.用于定义辅助的策略参数.
           additionalProperties:
             type: string
+            minLength: 1
+            maxLength: 500
+          minLength: 1
+          maxLength: 50
       required: 
         - type
     StdAnswer:
@@ -618,25 +718,23 @@ components:
       description: 标准答案.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 答案编号.编号越小,优先级越高.
-          minimum: 1
+          $ref: '#/components/schemas/NumberField'
         description:
-          type: string
-          description: 描述信息,用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         choices:
           type: array
           description: 选择集.用于支持类选择题形式.
           items:
-            type: integer
-            format: int32
-            description: 选项编号.
+            $ref: '#/components/schemas/NumberField'
+          minLength: 1
+          maxLength: 20
         criteria:
           type: array
           description: 非选项形式的答案内容集.用于支持非选择题形式.
           items:
             $ref: '#/components/schemas/MediumValue'
+          minLength: 1
+          maxLength: 20
       required: 
         - number
     QTagBrief:
@@ -644,51 +742,127 @@ components:
       description: 题目标签的简单形式.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         title:
-          type: string
+          $ref: '#/components/schemas/QTagTitle'
       required: 
         - id
         - title
+    QTagTitle:
+      type: string
+      description: 不可重复.
+      minLength: 1
+      maxLength: 25
+    IdQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定id所属的集合. =relation=>in.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+        exclude:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
     ResourceBrief:
       type: object
       description: 资源的简单形式.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types.
+          $ref: '#/components/schemas/MediaTypeField'
         contentNumber:
-          type: integer
-          format: int32
-          description: 资源内容的编号.  
+          $ref: '#/components/schemas/NumberField'
         contentUrl:
           type: string
-          description: 资源内容的实际访问地址. 此属性仅在外网使用.
+          description: 资源内容的实际访问地址.
+          minLength: 1
+          maxLength: 250
+    RichTextContentField:
+      type: string
+      description: 富文本编辑器输出的内容.
+      minLength: 1
+      maxLength: 2000
+    NumberField:
+      type: integer
+      format: int32
+      description: 编号.编号越小,优先级越高.
+      minimum: 0
     MediumValue:
       type: object
-      description: 多媒体形式的值.
+      description: '多媒体形式的值.表现为两种形式: a.资源型,此时有效字段为resourceId和mediaType, b.直接文本型,此时有效字段为mediaType和value.'
       properties:
         resourceId:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types
+          $ref: '#/components/schemas/MediaTypeField'
         value:
           type: string
           description: 值.
+          minLength: 1
+          maxLength: 1000
       required:
         - mediaType
       example: 
         mediaType: "text/plain"
         value: "tabu"
+    MgmtDescriptionField:
+      type: string
+      description: 用于管理的描述信息.
+      minLength: 1
+      maxLength: 250
+    MediaTypeField:
+      type: string
+      externalDocs: 
+        description: wiki
+        url: https://en.wikipedia.org/wiki/Media_type
+      description: mime.types
+      minLength: 1
+      maxLength: 100
+    ObjectID:
+      type: string
+      description: MongoDB:ObjectId
+      minLength: 24
+      maxLength: 24
     BasicPage:
       type: object
       description: 分页基本信息.
@@ -718,6 +892,10 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
+        - DuplicateTitle
   securitySchemes:
     questionRepoAuth:
       type: oauth2
@@ -734,6 +912,9 @@ components:
       schema:
         type: integer
         format: int32
+        minimum: 0
+        maximum: 100
+        default: 0
     pageSize:
       name: size
       in: query
@@ -741,7 +922,10 @@ components:
       schema:
         type: integer
         format: int32
-    pageSort:
+        minimum: 1
+        maximum: 100
+        default: 10
+    pageSortWithDefaultCreateTimeDesc:
       name: sort
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
@@ -749,5 +933,27 @@ components:
         type: array
         items:
           type: string
+          minLength: 1
+          maxLength: 50
+        default: 
+          - 'createTime,desc'
+        minLength: 1
+        maxLength: 5
+      style: form
+      explode: true
+    pageSortWithDefaultLUTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+          minLength: 1
+          maxLength: 50
+        default: 
+          - 'lUTime,desc'
+        minLength: 1
+        maxLength: 5
       style: form
       explode: true
