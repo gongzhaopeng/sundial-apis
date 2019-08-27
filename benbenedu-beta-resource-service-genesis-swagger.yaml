@@ -64,7 +64,7 @@ paths:
         - ResourceTag
       summary: Query资源标签.
       description: Query资源标签.
-      operationId: queryRsrctags
+      operationId: queryRsrcTags
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
