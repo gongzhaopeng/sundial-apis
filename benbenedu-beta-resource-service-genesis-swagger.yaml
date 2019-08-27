@@ -303,7 +303,7 @@ paths:
           description: 指定资源内容的编号.
           required: true
           schema:
-            $ref: '#/components/schemas/ResourceContentNumber'
+            $ref: '#/components/schemas/NumberField'
       responses:
         '200':
           description: 获取成功.
@@ -342,7 +342,7 @@ paths:
           description: 指定资源内容的编号.
           required: true
           schema:
-            $ref: '#/components/schemas/ResourceContentNumber'
+            $ref: '#/components/schemas/NumberField'
       responses:
         '200':
           description: 获取成功.
@@ -729,7 +729,7 @@ components:
       description: 资源内容.
       properties:
         number:
-          $ref: '#/components/schemas/ResourceContentNumber'
+          $ref: '#/components/schemas/NumberField'
         quality:
           $ref: '#/components/schemas/ResourceContentQuality'
         size:
@@ -755,10 +755,10 @@ components:
       required: 
         - number
         - size
-    ResourceContentNumber:
+    NumberField:
       type: integer
       format: int32
-      description: 资源内容的编号.
+      description: 编号.编号越小,优先级越高.
       minimum: 0
     ResourceContentQuality:
       type: integer
