@@ -46,6 +46,17 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -62,7 +73,7 @@ paths:
           description: 指定epmtag的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -105,6 +116,17 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -121,7 +143,7 @@ paths:
           description: 指定试卷模子的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -150,7 +172,7 @@ paths:
           description: 指定试卷模子的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 请求更新的试卷模子设计信息.
         content:
@@ -168,8 +190,33 @@ paths:
           description: Forbidden.
         '404':
           description: 指定的试卷模子不存在.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateTitle'
+                    detail: '${detail}'
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                alteringNotAllowed:
+                  value:
+                    code: 'AlteringNotAllowed'
+                    detail: '${detail}'
+                  description: '更改仅在Developing状态下被允许.'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -186,7 +233,7 @@ paths:
           description: 指定试卷模子的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 试卷模子状态更新请求信息.
         content:
@@ -206,6 +253,20 @@ paths:
           description: 指定的试卷模子不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                specifiedStateConversionNotAllowed:
+                  value:
+                    code: 'SpecifiedStateConversionNotAllowed'
+                    detail: '${detail}'
+                  description: '允许的状态转换路径: Developing->Usable->Discarded'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -222,7 +283,7 @@ paths:
           description: 指定试卷模子的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 试卷模子标签集更新请求信息.
         content:
@@ -242,6 +303,15 @@ paths:
           description: 指定的试卷模子不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -289,7 +359,7 @@ paths:
           description: 指定试卷的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
