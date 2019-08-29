@@ -313,11 +313,9 @@ components:
       description: 创建试卷模子标签的请求信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpmTagTitle'
         description:
-          type: string
-          description: 描述信息.
+          $ref: '#/components/schemas/MgmtDescriptionField'
       required: 
         - title
     EpmTagCreatedResp:
@@ -325,124 +323,28 @@ components:
       description: 试卷模子标签创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
-    EpmTag:
-      type: object
-      description: 试卷模子标签.用于试卷模子管理.
-      properties:
-        id: 
-          type: string
-        createTime:
-          type: integer
-          format: int64
-          description: 创建时间(timestamp).
-        author:
-          $ref: '#/components/schemas/AuthorBrief'
-        title:
-          type: string
-          description: 标题.
-        description:
-          type: string
-          description: 描述信息.
-      required: 
-        - id
-        - createTime
-        - author
-        - title
     EpMoldDesign:
       type: object
       description: 试卷模子的设计信息.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpTitle'
         description:
-          type: string
-          description: 描述信息, 用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         introduction:
-          type: string
-          description: 试卷引导语.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/EpIntroduction'
         epsGenerators:
-          type: array
-          description: 试卷块生成器集合.
-          items:
-            $ref: '#/components/schemas/CompositeEpsGenerator'
+          $ref: '#/components/schemas/EpmEpsGenerators'
         extFeatures:
-          type: object
-          description: 扩展的特征集,有业务含义.
-          additionalProperties:
-            $ref: '#/components/schemas/MediumValue'
+          $ref: '#/components/schemas/EpExtFeatures'
         defaultQuScore:
-          type: number
-          format: float
-          description: 试卷内题目单位的缺省分值.
+          $ref: '#/components/schemas/DefaultQuScore'
         resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
+          $ref: '#/components/schemas/EpResources'
       required: 
-        - title
-        - epsGenerators
-    ExamPaperMold:
-      type: object
-      description: 试卷模子.
-      properties:
-        id:
-          type: string
-        createTime:
-          type: integer
-          format: int64
-          description: 创建时间(timestamp).
-        lUTime:
-          type: integer
-          format: int64
-          description: 最近一次更新时间(timestamp).
-        author:
-          $ref: '#/components/schemas/AuthorBrief'
-        state:
-          $ref: '#/components/schemas/EpmState'
-        title:
-          type: string
-          description: 标题.
-        description:
-          type: string
-          description: 描述信息, 用于管理.
-        introduction:
-          type: string
-          description: 试卷引导语.富文本编辑器输出的结果.
-        epsGenerators:
-          type: array
-          description: 试卷块生成器集合.
-          items:
-            $ref: '#/components/schemas/CompositeEpsGenerator'
-        tags:
-          type: array
-          description: 标签集.用于管理.
-          items:
-            $ref: '#/components/schemas/EpmTagBrief'
-        extFeatures:
-          type: object
-          description: 扩展的特征集,有业务含义.
-          additionalProperties:
-            $ref: '#/components/schemas/MediumValue'
-        defaultQuScore:
-          type: number
-          format: float
-          description: 试卷内题目单位的缺省分值.
-        resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
-      required: 
-        - id
-        - createTime
-        - lUTime
-        - author
-        - state
         - title
         - epsGenerators
     EpMoldCreatedResp:
@@ -450,7 +352,7 @@ components:
       description: 试卷模子创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
     EpMoldUpdatingReq:
@@ -489,25 +391,24 @@ components:
           description: 最近一次更新时间(timestamp).
         newTags:
           type: array
-          description: 新的标签集.
+          description: 新的标签集. 该数组长度为0时表示清除所有标签.
           items:
-            type: string
-            description: 试卷模子标签的ID.
+            $ref: '#/components/schemas/ObjectID'
+          minLength: 0
+          maxLength: 50
       required: 
         - epmLUTime
         - newTags
     ExamPaperCreatingReq:
       type: object
-      description: 创建试卷的请求信息.
+      description: '创建试卷的请求信息. 携带admissionTicket参数时表示要创建对应的定制化试卷, 未携带admissionTicket参数则表示要创建通用试卷.'
       properties:
         admissionTicket:
           $ref: '#/components/schemas/EpAdmissionTicket'
         epmId:
-          type: string
-          description: 指定试卷模子的ID
+          $ref: '#/components/schemas/ObjectID'
         mark:
-          type: string
-          description: 标记.
+          $ref: '#/components/schemas/EpMark'
       required: 
         - epmId
     ExamPaperCreatedResp:
@@ -515,21 +416,75 @@ components:
       description: 试卷创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
-    AuthorBrief:
+    EpmTag:
       type: object
-      description: 作者的简单信息.
+      description: 试卷模子标签.用于试卷模子管理.
+      properties:
+        id: 
+          $ref: '#/components/schemas/ObjectID'
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        title:
+          $ref: '#/components/schemas/EpmTagTitle'
+        description:
+          $ref: '#/components/schemas/MgmtDescriptionField'
+      required: 
+        - id
+        - createTime
+        - author
+        - title
+    ExamPaperMold:
+      type: object
+      description: 试卷模子.
       properties:
         id:
-          type: string
-        name:
-          type: string
-        nickname:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
+        createTime:
+          type: integer
+          format: int64
+          description: 创建时间(timestamp).
+        lUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
+        author:
+          $ref: '#/components/schemas/AuthorBrief'
+        state:
+          $ref: '#/components/schemas/EpmState'
+        title:
+          $ref: '#/components/schemas/EpTitle'
+        description:
+          $ref: '#/components/schemas/MgmtDescriptionField'
+        introduction:
+          $ref: '#/components/schemas/EpIntroduction'
+        epsGenerators:
+          $ref: '#/components/schemas/EpmEpsGenerators'
+        extFeatures:
+          $ref: '#/components/schemas/EpExtFeatures'
+        defaultQuScore:
+          $ref: '#/components/schemas/DefaultQuScore'
+        resources:
+          $ref: '#/components/schemas/EpResources'
+        tags:
+          type: array
+          description: 标签集.用于管理.
+          items:
+            $ref: '#/components/schemas/EpmTagBrief'
       required: 
         - id
+        - createTime
+        - lUTime
+        - author
+        - state
+        - title
+        - epsGenerators
     EpmState:
       type: string
       description: 试卷模子的状态.
@@ -537,21 +492,51 @@ components:
         - Developing
         - Usable
         - Discarded
+      minLength: 1
+      maxLength: 50
+    EpTitle:
+      type: string
+      description: 试卷标题.
+      minLength: 1
+      maxLength: 200
+    EpIntroduction:
+      type: string
+      description: 试卷引导语.富文本编辑器输出的结果.
+      minLength: 1
+      maxLength: 2000
+    EpmEpsGenerators:
+      type: array
+      description: 试卷模子下最顶层的试卷块生成器集合.
+      items:
+        $ref: '#/components/schemas/CompositeEpsGenerator'
+      minLength: 1
+      maxLength: 50
+    EpExtFeatures:
+      type: object
+      description: 试卷的扩展特征集,有业务含义.
+      additionalProperties:
+        $ref: '#/components/schemas/MediumValue'
+      minLength: 1
+      maxLength: 20
+    EpResources:
+      type: array
+      description: 对应试卷层用到的资源集.
+      items:
+        $ref: '#/components/schemas/ResourceBrief'
+      minLength: 1
+      maxLength: 50
     CompositeEpsGenerator:
       type: object
       description: 可复合的试卷块生成器.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpsTitle'
         purpose:
           $ref: '#/components/schemas/EpsPurpose'
         description:
-          type: string
-          description: 描述信息,用于管理.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         introduction:
-          type: string
-          description: 试卷块引导语.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/EpsIntroduction'
         generateStrategy:
           $ref: '#/components/schemas/EpsGenerateStrategy'
         subGenerators:
@@ -559,33 +544,32 @@ components:
           description: 下属的子生成器集.
           items:
             $ref: '#/components/schemas/CompositeEpsGenerator'
+          minLength: 1
+          maxLength: 50
         questions:
           type: array
-          description: 对应的题集.
+          description: '对应的题集. 当purpose取值为Formal时, 当前试卷块中引入的题目须将answerMatchStrategy, stdAnswers以及对应的资源过滤掉.'
           items:
             $ref: '#/components/schemas/EpQuestion'
+          minLength: 1
+          maxLength: 2000
         timeLimit:
-          type: integer
-          format: int32
-          description: 限时.单位(second).
+          $ref: '#/components/schemas/EpsTimeLimit'
         extFeatures:
-          type: object
-          description: 扩展的特征集,有业务含义.
-          additionalProperties:
-            $ref: '#/components/schemas/MediumValue'
+          $ref: '#/components/schemas/EpsExtFeatures'
         defaultQuScore:
-          type: number
-          format: float
-          description: 试卷块范围内缺省的题目单位分值.
+          $ref: '#/components/schemas/DefaultQuScore'
         resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
+          $ref: '#/components/schemas/EpsResources'
       required:
         - title
         - purpose
         - generateStrategy
+    EpsTitle:
+      type: string
+      description: 试卷块标题.
+      minLength: 1
+      maxLength: 200
     EpsPurpose:
       type: string
       description: 试卷块的用途.
@@ -593,6 +577,13 @@ components:
         - Formal
         - Practice
         - Example
+      minLength: 1
+      maxLength: 50
+    EpsIntroduction:
+      type: string
+      description: 试卷块引导语.富文本编辑器输出的结果.
+      minLength: 1
+      maxLength: 2000
     EpsGenerateStrategy:
       type: object
       description: 试卷块生成策略.
@@ -605,36 +596,66 @@ components:
             - CompositeRand
             - QSetFix
             - QSetRand
+          minLength: 1
+          maxLength: 50
         metadata:
           type: object
           description: 策略元数据.用于定义辅助的策略参数.
           additionalProperties:
             type: string
+            minLength: 1
+            maxLength: 500
+          minLength: 1
+          maxLength: 50
           example:
             outputEpsCount: 3
             outputQuestionCount: 10
       required: 
         - type
+    EpsTimeLimit:
+      type: integer
+      format: int32
+      description: 限时.单位(second).
+      minimum: 1
+    EpsExtFeatures:
+      type: object
+      description: 试卷块的扩展特征集,有业务含义.
+      additionalProperties:
+        $ref: '#/components/schemas/MediumValue'
+      minLength: 1
+      maxLength: 20
+    EpsResources:
+      type: array
+      description: 对应试卷块层用到的资源集.
+      items:
+        $ref: '#/components/schemas/ResourceBrief'
+      minLength: 1
+      maxLength: 50
     EpQuestion:
       type: object
       description: 试卷题目.
       properties:
         id:
-          type: string
-          description: 对应的题库中题目的ID
+          $ref: '#/components/schemas/ObjectID'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpQuestionTitle'
         compositeEpQunit:
           $ref: '#/components/schemas/CompositeEpQuestionUnit'
         difficulty:
-          type: number
-          format: float
-          description: 题目的难度系数.
+          $ref: '#/components/schemas/EpQuestionDifficulty'
       required: 
         - id
         - title
         - compositeEpQunit
+    EpQuestionTitle:
+      type: string
+      description: 题目标题.
+      minLength: 1
+      maxLength: 200
+    EpQuestionDifficulty:
+      type: number
+      format: float
+      description: 题目的难度系数.
     CompositeEpQuestionUnit:
       type: object
       description: 可复合的试卷题目单位.
@@ -642,14 +663,14 @@ components:
         form:
           $ref: '#/components/schemas/EpQuForm'
         stem:
-          type: string
-          description: 题干.富文本编辑器输出的结果.
-            资源由客户端上传至资源服务器(建议添加资源浏览功能).
+          $ref: '#/components/schemas/RichTextContentField'
         options:
           type: array
           description: 可选项集.仅当形式为选择题时出现.
           items:
             $ref: '#/components/schemas/EpQuOption'
+          minLength: 1
+          maxLength: 20
         quScore:
           type: number
           format: float
@@ -661,21 +682,29 @@ components:
           description: 标准答案集.
           items:
             $ref: '#/components/schemas/EpStdAnswer'
+          minLength: 1
+          maxLength: 20
         subQunits:
           type: array
           description: 下属的题目单位集.
           items:
             $ref: '#/components/schemas/CompositeEpQuestionUnit'
+          minLength: 1
+          maxLength: 20
         extFeatures:
           type: object
           description: 扩展的特征集,有业务含义.
           additionalProperties:
             $ref: '#/components/schemas/MediumValue'
+          minLength: 1
+          maxLength: 20
         resources:
           type: array
           description: 当前层面用到的资源集.
           items:
             $ref: '#/components/schemas/ResourceBrief'
+          minLength: 1
+          maxLength: 50
       required: 
         - form
     EpQuForm:
@@ -687,18 +716,16 @@ components:
         - FillIn
         - QA
         - Composite
+      minLength: 1
+      maxLength: 50
     EpQuOption:
       type: object
       description: 可选项.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 选项编号.
-          minimum: 1
+          $ref: '#/components/schemas/NumberField'
         content:
-          type: string
-          description: 选项内容.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/RichTextContentField'
       required: 
         - number
         - content
@@ -712,11 +739,17 @@ components:
           enum: 
             - OrderSensitiveEqual
             - OrderInsensitiveEqual
+          minLength: 1
+          maxLength: 50
         metadata:
           type: object
           description: 策略元数据.用于定义辅助的策略参数.
           additionalProperties:
             type: string
+            minLength: 1
+            maxLength: 500
+          minLength: 1
+          maxLength: 50
       required: 
         - type
     EpStdAnswer:
@@ -724,22 +757,21 @@ components:
       description: 标准答案.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 答案编号.编号越小,优先级越高.
-          minimum: 1
+          $ref: '#/components/schemas/NumberField'
         choices:
           type: array
           description: 选择集.用于支持类选择题形式.
           items:
-            type: integer
-            format: int32
-            description: 选项编号.
+            $ref: '#/components/schemas/NumberField'
+          minLength: 1
+          maxLength: 20
         criteria:
           type: array
           description: 非选项形式的答案内容集.用于支持非选择题形式.
           items:
             $ref: '#/components/schemas/MediumValue'
+          minLength: 1
+          maxLength: 20
         score:
           type: number
           format: float
@@ -751,18 +783,23 @@ components:
       description: 试卷模子标签的简单形式.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         title:
-          type: string
+          $ref: '#/components/schemas/EpmTagTitle'
       required: 
         - id
         - title
+    EpmTagTitle:
+      type: string
+      description: 不可重复.
+      minLength: 1
+      maxLength: 25
     ExamPaper:
       type: object
       description: 试卷.
       properties:
         id: 
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -770,36 +807,24 @@ components:
         admissionTicket:
           $ref: '#/components/schemas/EpAdmissionTicket'
         epmId:
-          type: string
-          description: 对应的试卷模子的ID
+          $ref: '#/components/schemas/ObjectID'
         mark:
-          type: string
-          description: 标记.
+          $ref: '#/components/schemas/EpMark'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpTitle'
         introduction:
-          type: string
-          description: 试卷引导语.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/EpIntroduction'
         sections:
           type: array
           description: 包含的试卷块集.
           items:
             $ref: '#/components/schemas/CompositeEpSection'
         extFeatures:
-          type: object
-          description: 扩展的特征集,有业务含义.
-          additionalProperties:
-            $ref: '#/components/schemas/MediumValue'
+          $ref: '#/components/schemas/EpExtFeatures'
         defaultQuScore:
-          type: number
-          format: float
-          description: 试卷内题目单位的缺省分值.
+          $ref: '#/components/schemas/DefaultQuScore'
         resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
+          $ref: '#/components/schemas/EpResources'
       required: 
         - id
         - createTime
@@ -812,30 +837,30 @@ components:
       description: 准考证在试卷内的表示.
       properties:
         id:
-          type: string
-          description: 准考证ID.
+          $ref: '#/components/schemas/ObjectID'
         userId:
-          type: string
-          description: 用户ID.
+          $ref: '#/components/schemas/ObjectID'
         examId:
-          type: string
-          description: 考试ID.
+          $ref: '#/components/schemas/ObjectID'
       required: 
         - id
         - userId
         - examId
+    EpMark:
+      type: string
+      description: 标记.
+      minLength: 1
+      maxLength: 200
     CompositeEpSection:
       type: object
       description: 可复合的试卷块.
       properties:
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpsTitle'
         purpose:
           $ref: '#/components/schemas/EpsPurpose'
         introduction:
-          type: string
-          description: 试卷块引导语.富文本编辑器输出的结果.
+          $ref: '#/components/schemas/EpsIntroduction'
         subSections:
           type: array
           description: 下属的子试卷块集.
@@ -847,57 +872,46 @@ components:
           items:
             $ref: '#/components/schemas/EpQuestion'
         timeLimit:
-          type: integer
-          format: int32
-          description: 限时.单位(second).
+          $ref: '#/components/schemas/EpsTimeLimit'
         extFeatures:
-          type: object
-          description: 扩展的特征集,有业务含义.
-          additionalProperties:
-            $ref: '#/components/schemas/MediumValue'
+          $ref: '#/components/schemas/EpsExtFeatures'
         defaultQuScore:
-          type: number
-          format: float
-          description: 试卷块范围内缺省的题目单位分值.
+          $ref: '#/components/schemas/DefaultQuScore'
         resources:
-          type: array
-          description: 当前层面用到的资源集.
-          items:
-            $ref: '#/components/schemas/ResourceBrief'
+          $ref: '#/components/schemas/EpsResources'
       required: 
         - title
         - purpose
+    DefaultQuScore:
+      type: number
+      format: float
+      description: 对应范围内缺省的题目单位分值.
     ResourceBrief:
       type: object
       description: 资源的简单形式.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types.
+          $ref: '#/components/schemas/MediaTypeField'
         contents:
           type: array
           items:
             $ref: '#/components/schemas/ResourceContentBrief'
+          minLength: 1
+          maxLength: 5
+      required: 
+        - id
+        - mediaType
+        - contents
     ResourceContentBrief:
       type: object
       description: 资源内容摘要.
       properties:
         number:
-          type: integer
-          format: int32
-          description: 编号.
-          minimum: 0
+          $ref: '#/components/schemas/NumberField'
         quality:
-          type: integer
-          format: int32
-          description: 质量等级.
-          minimum: 1
-          maximum: 10
+          $ref: '#/components/schemas/ResourceContentQuality'
         size:
           type: integer
           format: int32
@@ -915,29 +929,113 @@ components:
         url:
           type: string
           description: 资源内容的实际访问地址.
+          minLength: 1
+          maxLength: 250
       required: 
         - number
         - size
+        - url
+    ResourceContentQuality:
+      type: integer
+      format: int32
+      description: 质量等级.
+      minimum: 1
+      maximum: 10
+    IdQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定id所属的集合. =relation=>in.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+        exclude:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+    AuthorBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    RichTextContentField:
+      type: string
+      description: 富文本编辑器输出的内容.
+      minLength: 1
+      maxLength: 2000
+    NumberField:
+      type: integer
+      format: int32
+      description: 编号.编号越小,优先级越高.
+      minimum: 0
     MediumValue:
       type: object
-      description: 多媒体形式的值.
+      description: '多媒体形式的值.表现为两种形式: a.资源型,此时有效字段为resourceId和mediaType, b.直接文本型,此时有效字段为mediaType和value.'
       properties:
         resourceId:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         mediaType:
-          type: string
-          externalDocs: 
-            description: wiki
-            url: https://en.wikipedia.org/wiki/Media_type
-          description: mime.types
+          $ref: '#/components/schemas/MediaTypeField'
         value:
           type: string
           description: 值.
+          minLength: 1
+          maxLength: 1000
       required:
         - mediaType
       example: 
         mediaType: "text/plain"
         value: "tabu"
+    MgmtDescriptionField:
+      type: string
+      description: 用于管理的描述信息.
+      minLength: 1
+      maxLength: 250
+    MediaTypeField:
+      type: string
+      externalDocs: 
+        description: wiki
+        url: https://en.wikipedia.org/wiki/Media_type
+      description: mime.types
+      minLength: 1
+      maxLength: 100
+    ObjectID:
+      type: string
+      description: MongoDB:ObjectId
+      minLength: 24
+      maxLength: 24
     BasicPage:
       type: object
       description: 分页基本信息.
@@ -967,6 +1065,10 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
+        - DuplicateTitle
   securitySchemes:
     exampaperRepoAuth:
       type: oauth2
@@ -983,6 +1085,9 @@ components:
       schema:
         type: integer
         format: int32
+        minimum: 0
+        maximum: 100
+        default: 0
     pageSize:
       name: size
       in: query
@@ -990,7 +1095,10 @@ components:
       schema:
         type: integer
         format: int32
-    pageSort:
+        minimum: 1
+        maximum: 100
+        default: 10
+    pageSortWithDefaultCreateTimeDesc:
       name: sort
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
@@ -998,5 +1106,27 @@ components:
         type: array
         items:
           type: string
+          minLength: 1
+          maxLength: 50
+        default: 
+          - 'createTime,desc'
+        minLength: 1
+        maxLength: 5
+      style: form
+      explode: true
+    pageSortWithDefaultLUTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        type: array
+        items:
+          type: string
+          minLength: 1
+          maxLength: 50
+        default: 
+          - 'lUTime,desc'
+        minLength: 1
+        maxLength: 5
       style: form
       explode: true
