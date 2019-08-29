@@ -817,6 +817,11 @@ components:
           description: 资源内容的实际访问地址.
           minLength: 1
           maxLength: 250
+      required: 
+        - id
+        - mediaType
+        - contentNumber
+        - contentUrl
     RichTextContentField:
       type: string
       description: 富文本编辑器输出的内容.
