@@ -858,7 +858,6 @@ components:
       type: integer
       format: int32
       minimum: 0
-      maximum: 100
       default: 0
     PageSizeSpec:
       type: integer
