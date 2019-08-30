@@ -60,6 +60,39 @@ paths:
       security:
         - exampaperRepoAuth: 
           - client:inner
+  /epmtags/query:
+    post:
+      tags: 
+        - EpmTag
+      summary: Query试卷模子标签.
+      description: Query试卷模子标签.
+      operationId: queryEpmTags
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultCreateTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpmTagQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpmTagPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /epmtags/{epmtag-id}:
     get:
       tags: 
@@ -127,6 +160,39 @@ paths:
                   value:
                     code: 'DuplicateTitle'
                     detail: '${detail}'
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
+  /epmolds/query:
+    post:
+      tags: 
+        - ExamPaperMold
+      summary: Query试卷模子.
+      description: Query试卷模子.
+      operationId: queryEpMolds
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -346,6 +412,39 @@ paths:
       security:
         - exampaperRepoAuth: 
           - client:inner
+  /exampapers/query:
+    post:
+      tags: 
+        - ExamPaper
+      summary: Query试卷.
+      description: Query试卷.
+      operationId: queryExamPapers
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultCreateTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamPaperQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamPaperPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - exampaperRepoAuth: 
+          - client:inner
   /exampapers/{exampaper-id}:
     get:
       tags:
@@ -396,6 +495,30 @@ components:
           $ref: '#/components/schemas/ObjectID'
       required: 
         - id
+    EpmTagQuery:
+      type: object
+      description: 试卷模子标签查询描述对象.
+      properties:
+        id: 
+          $ref: '#/components/schemas/IdQueryField'
+        createTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        author:
+          $ref: '#/components/schemas/IdQueryField'
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+    EpmTagPage:
+      description: 试卷模子标签分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EpmTag'
     EpMoldDesign:
       type: object
       description: 试卷模子的设计信息.
@@ -425,6 +548,43 @@ components:
           $ref: '#/components/schemas/ObjectID'
       required: 
         - id
+    EpMoldQuery:
+      type: object
+      description: 试卷模子查询描述对象.
+      properties:
+        id: 
+          $ref: '#/components/schemas/IdQueryField'
+        createTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        lUTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        author:
+          $ref: '#/components/schemas/IdQueryField'
+        state:
+          type: array
+          items:
+            $ref: '#/components/schemas/EpmState'
+          description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        description:
+          $ref: '#/components/schemas/TextSearchSpec'
+        introduction:
+          $ref: '#/components/schemas/TextSearchSpec'
+        tags:
+          $ref: '#/components/schemas/IdQueryField'
+    EpMoldPage:
+      description: 试卷模子分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExamPaperMold'
     EpMoldUpdatingReq:
       type: object
       description: 更新试卷模子的请求信息.
@@ -489,6 +649,38 @@ components:
           $ref: '#/components/schemas/ObjectID'
       required: 
         - id
+    ExamPaperQuery:
+      type: object
+      description: 试卷查询描述对象.
+      properties:
+        id: 
+          $ref: '#/components/schemas/IdQueryField'
+        createTime:
+          $ref: '#/components/schemas/TimeQueryField'
+        atId:
+          $ref: '#/components/schemas/IdQueryField'
+        atUserId:
+          $ref: '#/components/schemas/IdQueryField'
+        atExamId:
+          $ref: '#/components/schemas/IdQueryField'
+        epmId:
+          $ref: '#/components/schemas/IdQueryField'
+        mark:
+          $ref: '#/components/schemas/TextSearchSpec'
+        title:
+          $ref: '#/components/schemas/TextSearchSpec'
+        introduction:
+          $ref: '#/components/schemas/TextSearchSpec'
+    ExamPaperPage:
+      description: 试卷分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExamPaper'
     EpmTag:
       type: object
       description: 试卷模子标签.用于试卷模子管理.
