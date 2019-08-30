@@ -1298,19 +1298,6 @@ components:
       description: MongoDB:ObjectId
       minLength: 24
       maxLength: 24
-    BasicPage:
-      type: object
-      description: 分页基本信息.
-      properties:
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-      required: 
-        - totalPages
-        - totalElements
     ErrorResponse:
       description: 错误响应.
       type: object
@@ -1331,6 +1318,51 @@ components:
         - AlteringNotAllowed
         - SpecifiedStateConversionNotAllowed
         - DuplicateTitle
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
+    PageNumberSpec:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 100
+      default: 0
+    PageSizeSpec:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 10
+    PageSortWithDefaultCreateTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'createTime,desc'
+    PageSortWithDefaultLUTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'lUTime,desc'
   securitySchemes:
     exampaperRepoAuth:
       type: oauth2
@@ -1345,35 +1377,19 @@ components:
       in: query
       description: 指定页码.
       schema:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 100
-        default: 0
+        $ref: '#/components/schemas/PageNumberSpec'
     pageSize:
       name: size
       in: query
       description: 指定页长.
       schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-        default: 10
+        $ref: '#/components/schemas/PageSizeSpec'
     pageSortWithDefaultCreateTimeDesc:
       name: sort
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
       schema:
-        type: array
-        items:
-          type: string
-          minLength: 1
-          maxLength: 50
-        default: 
-          - 'createTime,desc'
-        minLength: 1
-        maxLength: 5
+        $ref: '#/components/schemas/PageSortWithDefaultCreateTimeDescSpec'
       style: form
       explode: true
     pageSortWithDefaultLUTimeDesc:
@@ -1381,14 +1397,6 @@ components:
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
       schema:
-        type: array
-        items:
-          type: string
-          minLength: 1
-          maxLength: 50
-        default: 
-          - 'lUTime,desc'
-        minLength: 1
-        maxLength: 5
+        $ref: '#/components/schemas/PageSortWithDefaultLUTimeDescSpec'
       style: form
       explode: true
