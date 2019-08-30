@@ -44,6 +44,17 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateName'
+                    detail: '${detail}'
       security:
         - deliveryAuth: 
           - client:inner
@@ -57,7 +68,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
-        - $ref: '#/components/parameters/pageSort'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
       requestBody:
         description: 查询描述.
         content:
@@ -93,7 +104,7 @@ paths:
           description: 指定考试站的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -122,7 +133,7 @@ paths:
           description: 指定考试站的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 请求更新的考试站信息.
         content:
@@ -140,8 +151,33 @@ paths:
           description: Forbidden.
         '404':
           description: 指定的考试站不存在.
+        '409':
+          description: Conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateTitle:
+                  value:
+                    code: 'DuplicateName'
+                    detail: '${detail}'
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                alteringNotAllowed:
+                  value:
+                    code: 'AlteringNotAllowed'
+                    detail: '${detail}'
+                  description: '更改仅在Building状态下被允许.'
       security:
         - deliveryAuth: 
           - client:inner
@@ -158,7 +194,7 @@ paths:
           description: 指定考试站的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 考试站状态更新请求信息.
         content:
@@ -178,6 +214,20 @@ paths:
           description: 指定的考试站不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                specifiedStateConversionNotAllowed:
+                  value:
+                    code: 'SpecifiedStateConversionNotAllowed'
+                    detail: '${detail}'
+                  description: '允许的状态转换路径: Developing->{Operative, Suspended, Destroyed}, Operative->{Suspended, Destroyed}, Suspended->{Operative, Destroyed}'
       security:
         - deliveryAuth: 
           - client:inner
@@ -220,7 +270,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
-        - $ref: '#/components/parameters/pageSort'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
       requestBody:
         description: 查询描述.
         content:
@@ -256,7 +306,7 @@ paths:
           description: 指定试卷递送任务的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       responses:
         '200':
           description: 获取成功.
@@ -286,7 +336,7 @@ paths:
           description: 指定试卷递送任务的ID.
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ObjectID'
       requestBody:
         description: 试卷递送任务状态更新请求信息.
         content:
@@ -306,8 +356,22 @@ paths:
           description: 指定的试卷递送任务不存在.
         '428':
           description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+                specifiedStateConversionNotAllowed:
+                  value:
+                    code: 'SpecifiedStateConversionNotAllowed'
+                    detail: '${detail}'
+                  description: '允许的状态转换路径: Active->{Inactive, Deleted}, Inactive->{Active, Deleted}'
       security:
-        - questionRepoAuth: 
+        - deliveryAuth: 
           - client:inner
 components:
   schemas:
@@ -316,22 +380,16 @@ components:
       description: 创建考试站的请求信息.
       properties:
         name:
-          type: string
-          description: 名称.
+          $ref: '#/components/schemas/ExamStationName'
         description:
-          type: string
-          description: 描述.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         type:
           $ref: '#/components/schemas/ExamStationType'
         host:
-          type: string
-          description: Host.
-          example: 
-            api.openeva.com:9000
+          $ref: '#/components/schemas/ExamStationHost'
         resourceEngine:
           $ref: '#/components/schemas/ResourceEngine'
       required: 
-        - state
         - name
         - type
         - host
@@ -341,38 +399,28 @@ components:
       description: 考试站创建成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
+      required: 
+        - id
     ExamStationQuery:
       type: object
       description: 考试站查询描述对象.
       properties:
         id: 
-          type: array
-          items:
-            type: string
-          description: 指定id所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         createTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定createTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         lUTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定lUTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         creator:
-          type: array
-          items:
-            type: string
-          description: 指定creator所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         state:
           type: array
           items:
             $ref: '#/components/schemas/ExamStationState'
           description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         name:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -382,6 +430,8 @@ components:
           items:
             $ref: '#/components/schemas/ExamStationType'
           description: 指定type所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         host:
           $ref: '#/components/schemas/TextSearchSpec'
         resourceEngineProvider:
@@ -389,6 +439,8 @@ components:
           items:
             $ref: '#/components/schemas/ResourceEngineProvider'
           description: 指定resourceEngineProvider所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
     ExamStationPage:
       description: 考试站分页.
       allOf:
@@ -399,6 +451,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ExamStation'
+              minLength: 0
+          required:
+            - content
     ExamStationUpdatingReq:
       type: object
       description: 更新考试站的请求信息.
@@ -430,8 +485,7 @@ components:
       description: 提交试卷递送任务的请求信息.
       properties:
         description:
-          type: string
-          description: 描述.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         exampaper:
           $ref: '#/components/schemas/ExampaperBrief'
         examStation:
@@ -439,6 +493,7 @@ components:
         autoPerform:
           type: boolean
           description: 是否自动执行.
+          default: false
       required:
         - exampaper
         - examStation
@@ -447,54 +502,38 @@ components:
       description: 试卷递送任务提交成功时的响应.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
+      required: 
+        - id
     EpDeliveryTaskQuery:
       type: object
       description: 试卷递送任务查询描述对象.
       properties:
         id: 
-          type: array
-          items:
-            type: string
-          description: 指定id所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         createTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定createTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         lUTime:
-          type: array
-          items:
-            type: integer
-            format: int64
-          description: 指定lUTime所属的区间序列. =relation=>in.
+          $ref: '#/components/schemas/TimeQueryField'
         creator:
-          type: array
-          items:
-            type: string
-          description: 指定author所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         state:
           type: array
           items:
             $ref: '#/components/schemas/DeliveryTaskState'
           description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         description:
           $ref: '#/components/schemas/TextSearchSpec'
         exampaperId:
-          type: array
-          items:
-            type: string
-          description: 指定exampaperId所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         exampaperTitle:
           $ref: '#/components/schemas/TextSearchSpec'
         exampaperMark:
           $ref: '#/components/schemas/TextSearchSpec'
         examStationId:
-          type: array
-          items:
-            type: string
-          description: 指定examStationId所属的集合. =relation=>in.
+          $ref: '#/components/schemas/IdQueryField'
         examStationName:
           $ref: '#/components/schemas/TextSearchSpec'
         examStationType:
@@ -502,6 +541,8 @@ components:
           items:
             $ref: '#/components/schemas/ExamStationType'
           description: 指定examStationType所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
         examStationHost:
           $ref: '#/components/schemas/TextSearchSpec'
         performingState:
@@ -509,6 +550,8 @@ components:
           items:
             $ref: '#/components/schemas/DeliveryTaskPerformingState'
           description: 指定performingState所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
     EpDeliveryTaskPage:
       description: 试卷递送任务分页.
       allOf:
@@ -519,6 +562,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ExampaperDeliveryTask'
+              minLength: 0
+          required:
+            - content
     DeliveryTaskStateUpdatingReq:
       type: object
       description: 更新递送任务状态的请求信息.
@@ -537,7 +583,7 @@ components:
       description: 考试站.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -551,18 +597,13 @@ components:
         state:
           $ref: '#/components/schemas/ExamStationState'
         name:
-          type: string
-          description: 名称.
+          $ref: '#/components/schemas/ExamStationName'
         description:
-          type: string
-          description: 描述.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         type:
           $ref: '#/components/schemas/ExamStationType'
         host:
-          type: string
-          description: Host.
-          example: 
-            api.openeva.com:9000
+          $ref: '#/components/schemas/ExamStationHost'
         resourceEngine:
           $ref: '#/components/schemas/ResourceEngine'
       required: 
@@ -583,11 +624,27 @@ components:
         - Operative
         - Suspended
         - Destroyed
+      minLength: 1
+      maxLength: 50
+    ExamStationName:
+      type: string
+      description: 考试站名字.
+      minLength: 1
+      maxLength: 200
     ExamStationType:
       type: string
       description: 考试站类型.
       enum: 
         - OpenEva
+      minLength: 1
+      maxLength: 50
+    ExamStationHost:
+      type: string
+      description: 考试站Host.
+      minLength: 1
+      maxLength: 50
+      example: 
+        api.openeva.com:9000
     ResourceEngine:
       type: object
       description: 资源引擎.
@@ -603,20 +660,32 @@ components:
       description: 资源引擎供应商.
       enum:
         - AliyunOss
+      minLength: 1
+      maxLength: 50
     AliyunOssConfig:
       type: object
       description: Aliyun OSS configuration.
       properties:
         endpoint:
           type: string
+          minLength: 1
+          maxLength: 250
         bucket:
           type: string
+          minLength: 1
+          maxLength: 50
         accessKeyId:
           type: string
+          minLength: 1
+          maxLength: 100
         accessKeySecret:
           type: string
+          minLength: 1
+          maxLength: 1000
         path:
           type: string
+          minLength: 1
+          maxLength: 100
       required: 
         - endpoint
         - bucket
@@ -628,7 +697,7 @@ components:
       description: 试卷递送任务. 
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         createTime:
           type: integer
           format: int64
@@ -642,8 +711,7 @@ components:
         state:
           $ref: '#/components/schemas/DeliveryTaskState'
         description:
-          type: string
-          description: 描述.
+          $ref: '#/components/schemas/MgmtDescriptionField'
         exampaper:
           $ref: '#/components/schemas/ExampaperBrief'
         examStation:
@@ -678,37 +746,48 @@ components:
         - Active
         - Inactive
         - Deleted
+      minLength: 1
+      maxLength: 50
     ExampaperBrief:
       type: object
       description: 试卷的简单信息.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         title:
-          type: string
-          description: 标题.
+          $ref: '#/components/schemas/EpTitle'
         mark:
-          type: string
-          description: 标记.
+          $ref: '#/components/schemas/EpMark'
       required: 
         - id
         - title
+    EpTitle:
+      type: string
+      description: 试卷标题.
+      minLength: 1
+      maxLength: 200
+    EpMark:
+      type: string
+      description: 标记.
+      minLength: 1
+      maxLength: 200
     ExamStationBrief:
       type: object
       description: 考试站的简单信息.
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/ObjectID'
         name:
-          type: string
-          description: 名称.
+          $ref: '#/components/schemas/ExamStationName'
         type:
           $ref: '#/components/schemas/ExamStationType'
         host:
-          type: string
-          description: Host.
-          example: 
-            api.openeva.com:9000
+          $ref: '#/components/schemas/ExamStationHost'
+      required: 
+        - id
+        - name
+        - type
+        - host
     DeliveryTaskPerformingState:
       type: string
       description: 递送任务的执行状态.
@@ -717,18 +796,23 @@ components:
         - Performing
         - Error
         - Completed
-    AccountBrief:
-      type: object
-      description: 账户的简单信息.
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        nickname:
-          type: string
-      required: 
-        - id
+      minLength: 1
+      maxLength: 50
+    IdQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定id所属的集合. =relation=>in.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
     TextSearchSpec:
       type: object
       description: 文本搜索描述对象.
@@ -737,12 +821,42 @@ components:
           type: array
           items:
             type: string
+            minLength: 1
+            maxLength: 25
           description: =relation=>all.
+          minLength: 1
+          maxLength: 10
         exclude:
           type: array
           items:
             type: string
+            minLength: 1
+            maxLength: 25
           description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+    AccountBrief:
+      type: object
+      description: 作者的简单信息.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    MgmtDescriptionField:
+      type: string
+      description: 用于管理的描述信息.
+      minLength: 1
+      maxLength: 250
+    ObjectID:
+      type: string
+      description: MongoDB:ObjectId
+      minLength: 24
+      maxLength: 24
     BasicPage:
       type: object
       description: 分页基本信息.
@@ -756,6 +870,38 @@ components:
       required: 
         - totalPages
         - totalElements
+    PageNumberSpec:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 100
+      default: 0
+    PageSizeSpec:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 10
+    PageSortWithDefaultCreateTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'createTime,desc'
+    PageSortWithDefaultLUTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'lUTime,desc'
     ErrorResponse:
       description: 错误响应.
       type: object
@@ -772,6 +918,10 @@ components:
       description: 错误码.
       enum: 
         - Undefined
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
+        - DuplicateName
   securitySchemes:
     deliveryAuth:
       type: oauth2
@@ -786,22 +936,26 @@ components:
       in: query
       description: 指定页码.
       schema:
-        type: integer
-        format: int32
+        $ref: '#/components/schemas/PageNumberSpec'
     pageSize:
       name: size
       in: query
       description: 指定页长.
       schema:
-        type: integer
-        format: int32
-    pageSort:
+        $ref: '#/components/schemas/PageSizeSpec'
+    pageSortWithDefaultCreateTimeDesc:
       name: sort
       in: query
       description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
       schema:
-        type: array
-        items:
-          type: string
+        $ref: '#/components/schemas/PageSortWithDefaultCreateTimeDescSpec'
+      style: form
+      explode: true
+    pageSortWithDefaultLUTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        $ref: '#/components/schemas/PageSortWithDefaultLUTimeDescSpec'
       style: form
       explode: true
