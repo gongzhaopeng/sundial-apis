@@ -857,6 +857,26 @@ components:
       description: MongoDB:ObjectId
       minLength: 24
       maxLength: 24
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorResponseCode'
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
+        - DuplicateName
     BasicPage:
       type: object
       description: 分页基本信息.
@@ -902,26 +922,6 @@ components:
       maxLength: 5
       default: 
         - 'lUTime,desc'
-    ErrorResponse:
-      description: 错误响应.
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/ErrorResponseCode'
-        detail:
-          type: string
-          description: 错误详情.
-      required:
-        - code
-    ErrorResponseCode:
-      type: string
-      description: 错误码.
-      enum: 
-        - Undefined
-        - LUTimeConflict
-        - AlteringNotAllowed
-        - SpecifiedStateConversionNotAllowed
-        - DuplicateName
   securitySchemes:
     deliveryAuth:
       type: oauth2
