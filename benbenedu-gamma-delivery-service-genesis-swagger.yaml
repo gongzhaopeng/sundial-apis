@@ -637,6 +637,8 @@ components:
           type: boolean
           description: '值为false时,若任务的当前执行状态处于Performing, 则不允许发起新的执行. 值为true时,则不论任务的当前执行状态为何,强行发起新的执行.'
           default: false
+      required: 
+        - deliveryTaskLUTime
     ExamStation:
       type: object
       description: 考试站.
