@@ -411,6 +411,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
                 taskNonPerformable:
                   value:
                     code: 'TaskNonPerformable'
@@ -625,6 +629,10 @@ components:
       type: object
       description: 试卷递送任务执行请求信息.
       properties:
+        deliveryTaskLUTime:
+          type: integer
+          format: int64
+          description: 最近一次更新时间(timestamp).
         force:
           type: boolean
           description: '值为false时,若任务的当前执行状态处于Performing, 则不允许发起新的执行. 值为true时,则不论任务的当前执行状态为何,强行发起新的执行.'
