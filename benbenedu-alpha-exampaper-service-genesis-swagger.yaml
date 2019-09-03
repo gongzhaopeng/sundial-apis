@@ -528,7 +528,7 @@ components:
         description:
           $ref: '#/components/schemas/MgmtDescriptionField'
         introduction:
-          $ref: '#/components/schemas/EpIntroduction'
+          $ref: '#/components/schemas/RichTextContentField'
         epsGenerators:
           $ref: '#/components/schemas/EpmEpsGenerators'
         extFeatures:
@@ -725,7 +725,7 @@ components:
         description:
           $ref: '#/components/schemas/MgmtDescriptionField'
         introduction:
-          $ref: '#/components/schemas/EpIntroduction'
+          $ref: '#/components/schemas/RichTextContentField'
         epsGenerators:
           $ref: '#/components/schemas/EpmEpsGenerators'
         extFeatures:
@@ -761,11 +761,6 @@ components:
       description: 试卷标题.
       minLength: 1
       maxLength: 200
-    EpIntroduction:
-      type: string
-      description: 试卷引导语.富文本编辑器输出的结果.
-      minLength: 1
-      maxLength: 2000
     EpmEpsGenerators:
       type: array
       description: 试卷模子下最顶层的试卷块生成器集合.
@@ -798,7 +793,7 @@ components:
         description:
           $ref: '#/components/schemas/MgmtDescriptionField'
         introduction:
-          $ref: '#/components/schemas/EpsIntroduction'
+          $ref: '#/components/schemas/RichTextContentField'
         generateStrategy:
           $ref: '#/components/schemas/EpsGenerateStrategy'
         subGenerators:
@@ -841,11 +836,6 @@ components:
         - Example
       minLength: 1
       maxLength: 50
-    EpsIntroduction:
-      type: string
-      description: 试卷块引导语.富文本编辑器输出的结果.
-      minLength: 1
-      maxLength: 2000
     EpsGenerateStrategy:
       type: object
       description: 试卷块生成策略.
@@ -1075,7 +1065,7 @@ components:
         title:
           $ref: '#/components/schemas/EpTitle'
         introduction:
-          $ref: '#/components/schemas/EpIntroduction'
+          $ref: '#/components/schemas/RichTextContentField'
         sections:
           type: array
           description: 包含的试卷块集.
@@ -1122,7 +1112,7 @@ components:
         purpose:
           $ref: '#/components/schemas/EpsPurpose'
         introduction:
-          $ref: '#/components/schemas/EpsIntroduction'
+          $ref: '#/components/schemas/RichTextContentField'
         subSections:
           type: array
           description: 下属的子试卷块集.
