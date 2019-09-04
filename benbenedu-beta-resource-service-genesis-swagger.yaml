@@ -480,11 +480,11 @@ components:
       description: 资源标签查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -499,6 +499,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/RsrcTag'
+              minLength: 0
+          required:
+            - content
     ResourceCreatingReq:
       type: object
       description: 创建资源的请求信息.
@@ -528,13 +531,13 @@ components:
       description: 资源查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         lUTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         state:
           type: array
           items:
@@ -554,44 +557,7 @@ components:
           minLength: 1
           maxLength: 50
         tags:
-          $ref: '#/components/schemas/IdQueryField'
-    IdQueryField:
-      type: array
-      items:
-        $ref: '#/components/schemas/ObjectID'
-      description: 指定id所属的集合. =relation=>in.
-      minLength: 1
-      maxLength: 50
-    TimeQueryField:
-      type: array
-      items:
-        type: integer
-        format: int64
-      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
-      minLength: 2
-      maxLength: 20
-    TextSearchSpec:
-      type: object
-      description: 文本搜索描述对象.
-      properties:
-        include:
-          type: array
-          items:
-            type: string
-            minLength: 1
-            maxLength: 25
-          description: =relation=>all.
-          minLength: 1
-          maxLength: 10
-        exclude:
-          type: array
-          items:
-            type: string
-            minLength: 1
-            maxLength: 25
-          description: =relation=>all.
-          minLength: 1
-          maxLength: 10
+          $ref: '#/components/schemas/IdAllMatchQueryField'
     ResourcePage:
       description: 资源分页.
       allOf:
@@ -602,6 +568,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Resource'
+              minLength: 0
+          required:
+            - content
     ResourcePatch:
       type: object
       description: 资源补丁.
@@ -775,6 +744,50 @@ components:
         - Discarded
       minLength: 1
       maxLength: 50
+    IdAnyMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>any-match.
+      minLength: 1
+      maxLength: 50
+    IdAllMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>all-match.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+        exclude:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
     AuthorBrief:
       type: object
       description: 作者的简单信息.
