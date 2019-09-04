@@ -500,11 +500,11 @@ components:
       description: 试卷模子标签查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -519,6 +519,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/EpmTag'
+              minLength: 0
+          required:
+            - content
     EpMoldDesign:
       type: object
       description: 试卷模子的设计信息.
@@ -553,13 +556,13 @@ components:
       description: 试卷模子查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         lUTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         state:
           type: array
           items:
@@ -574,7 +577,7 @@ components:
         introduction:
           $ref: '#/components/schemas/TextSearchSpec'
         tags:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAllMatchQueryField'
     EpMoldPage:
       description: 试卷模子分页.
       allOf:
@@ -585,6 +588,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ExamPaperMold'
+              minLength: 0
+          required:
+            - content
     EpMoldUpdatingReq:
       type: object
       description: 更新试卷模子的请求信息.
@@ -654,17 +660,17 @@ components:
       description: 试卷查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         atId:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         atUserId:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         atExamId:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         epmId:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         mark:
           $ref: '#/components/schemas/TextSearchSpec'
         title:
@@ -681,6 +687,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ExamPaper'
+              minLength: 0
+          required:
+            - content
     EpmTag:
       type: object
       description: 试卷模子标签.用于试卷模子管理.
@@ -1193,11 +1202,18 @@ components:
       description: 质量等级.
       minimum: 1
       maximum: 10
-    IdQueryField:
+    IdAnyMatchQueryField:
       type: array
       items:
         $ref: '#/components/schemas/ObjectID'
-      description: 指定id所属的集合. =relation=>in.
+      description: 指定的id集合. =relation=>any-match.
+      minLength: 1
+      maxLength: 50
+    IdAllMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>all-match.
       minLength: 1
       maxLength: 50
     TimeQueryField:
