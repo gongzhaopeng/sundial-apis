@@ -404,11 +404,11 @@ components:
       description: 题目标签查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -423,6 +423,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/QTag'
+              minLength: 0
+          required:
+            - content
     QTag:
       type: object
       description: 题目标签.用于题目管理.
@@ -472,13 +475,13 @@ components:
       description: 题目查询描述对象.
       properties:
         id: 
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         createTime:
           $ref: '#/components/schemas/TimeQueryField'
         lUTime:
           $ref: '#/components/schemas/TimeQueryField'
         author:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
         state:
           type: array
           items:
@@ -507,7 +510,7 @@ components:
           minLength: 2
           maxLength: 20
         tags:
-          $ref: '#/components/schemas/IdQueryField'
+          $ref: '#/components/schemas/IdAllMatchQueryField'
     QuestionPage:
       description: 题目分页.
       allOf:
@@ -518,6 +521,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Question'
+              minLength: 0
+          required:
+            - content
     QuestionUpdatingReq:
       type: object
       description: 更新题目的请求信息.
@@ -753,11 +759,18 @@ components:
       description: 不可重复.
       minLength: 1
       maxLength: 25
-    IdQueryField:
+    IdAnyMatchQueryField:
       type: array
       items:
         $ref: '#/components/schemas/ObjectID'
-      description: 指定id所属的集合. =relation=>in.
+      description: 指定的id集合. =relation=>any-match.
+      minLength: 1
+      maxLength: 50
+    IdAllMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>all-match.
       minLength: 1
       maxLength: 50
     TimeQueryField:
