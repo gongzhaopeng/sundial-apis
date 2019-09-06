@@ -235,6 +235,36 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /examstations/{examstation-id}/runstatus:
+    get:
+      tags: 
+        - ExamStation
+      summary: 获取指定考试站的运行状态.
+      description: 获取指定考试站的运行状态.
+      operationId: getEstationRunStatusById
+      parameters: 
+        - name: examstation-id
+          in: path
+          description: 指定考试站的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstationRunStatus'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试站不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /epdeliveries:
     post:
       tags:
@@ -424,6 +454,16 @@ paths:
                     code: 'TaskNonPerformable'
                     detail: '${detail}'
                   description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
+      security:
+        - deliveryAuth: 
+          - client:inner
+  # /epdeliveries/{epdelivery-id}/publication/status:
+  #   get:
+  #     tags:
+  #       - ExamPaperDelivery
+  #     summary: 获取试卷递送任务对应的发行物的状态.
+  #     description: 获取试卷递送任务对应的发行物的状态.
+  #     operationId: 
   /examdeliveries:
     post:
       tags:
@@ -613,6 +653,9 @@ paths:
                     code: 'TaskNonPerformable'
                     detail: '${detail}'
                   description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
+      security:
+        - deliveryAuth: 
+          - client:inner
   /echaindeliveries:
     post:
       tags:
@@ -802,6 +845,9 @@ paths:
                     code: 'TaskNonPerformable'
                     detail: '${detail}'
                   description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
+      security:
+        - deliveryAuth: 
+          - client:inner
 components:
   schemas:
     ExamStationDefinition:
@@ -1310,6 +1356,22 @@ components:
         - accessKeyId
         - accessKeySecret
         - path
+    EstationRunStatus:
+      type: object
+      description: 考试站运行状态.
+      properties:
+        code:
+          $ref: '#/components/schemas/EstationRunStatusCode'
+      required:
+        - code
+    EstationRunStatusCode:
+      type: string
+      description: 考试站运行状态码.
+      enum: 
+        - UP
+        - DOWN
+      minLength: 1
+      maxLength: 50
     ExampaperDeliveryTask:
       type: object
       description: 试卷递送任务. 
