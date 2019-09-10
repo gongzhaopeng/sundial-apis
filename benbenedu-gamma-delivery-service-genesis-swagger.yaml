@@ -457,13 +457,36 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
-  # /epdeliveries/{epdelivery-id}/publication/status:
-  #   get:
-  #     tags:
-  #       - ExamPaperDelivery
-  #     summary: 获取试卷递送任务对应的发行物的状态.
-  #     description: 获取试卷递送任务对应的发行物的状态.
-  #     operationId: 
+  /epdeliveries/{epdelivery-id}/publication/status:
+    get:
+      tags:
+        - ExamPaperDelivery
+      summary: 获取试卷递送任务对应的发行物的状态.
+      description: 获取试卷递送任务对应的发行物的状态.
+      operationId: getEpPubStatusById
+      parameters: 
+        - name: epdelivery-id
+          in: path
+          description: 指定试卷递送任务的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicationStatus'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的试卷递送任务不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /examdeliveries:
     post:
       tags:
@@ -1619,6 +1642,27 @@ components:
         - Performing
         - Error
         - Completed
+      minLength: 1
+      maxLength: 50
+    PublicationStatus:
+      type: object
+      description: 递送到考试站上的发行物的状态信息.
+      properties:
+        code:
+          $ref: '#/components/schemas/PublicationStatusCode'
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - code
+    PublicationStatusCode:
+      type: string
+      description: 发行物的状态码.
+      enum: 
+        - Perfect
+        - Nonexistent
+        - Broken
+        - DependencyMissing
       minLength: 1
       maxLength: 50
     IdAnyMatchQueryField:
