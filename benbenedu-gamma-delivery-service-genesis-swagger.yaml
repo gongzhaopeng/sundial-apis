@@ -679,6 +679,36 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /examdeliveries/{examdelivery-id}/publication/status:
+    get:
+      tags:
+        - ExamDelivery
+      summary: 获取考试递送任务对应的发行物的状态.
+      description: 获取考试递送任务对应的发行物的状态.
+      operationId: getExamPubStatusById
+      parameters: 
+        - name: examdelivery-id
+          in: path
+          description: 指定考试递送任务的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicationStatus'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试递送任务不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /echaindeliveries:
     post:
       tags:
@@ -868,6 +898,36 @@ paths:
                     code: 'TaskNonPerformable'
                     detail: '${detail}'
                   description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /echaindeliveries/{echaindelivery-id}/publication/status:
+    get:
+      tags:
+        - EchainDelivery
+      summary: 获取考试链递送任务对应的发行物的状态.
+      description: 获取考试链递送任务对应的发行物的状态.
+      operationId: getEchainPubStatusById
+      parameters: 
+        - name: echaindelivery-id
+          in: path
+          description: 指定考试链递送任务的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicationStatus'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试链递送任务不存在.
       security:
         - deliveryAuth: 
           - client:inner
