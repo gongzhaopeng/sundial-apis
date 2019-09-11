@@ -406,7 +406,7 @@ paths:
                   value:
                     code: 'SpecifiedStateConversionNotAllowed'
                     detail: '${detail}'
-                  description: '允许的状态转换路径: Developing->Usable->Discarded'
+                  description: '允许的状态转换路径: Developing->{Usable,Discarded}, Usable->{Discarded}'
       security:
         - resourceRepoAuth: 
           - client:inner
