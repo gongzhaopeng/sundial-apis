@@ -629,7 +629,7 @@ components:
           format: int64
           description: 创建时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
         title:
           $ref: '#/components/schemas/RsrcTagTitle'
         description:
@@ -660,7 +660,9 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
+        version:
+          $ref: '#/components/schemas/SimpleVersion'
         state:
           $ref: '#/components/schemas/ResourceState'
         title:
@@ -684,6 +686,7 @@ components:
         - createTime
         - lUTime
         - author
+        - version
         - state
         - title
         - mediaType
@@ -788,18 +791,6 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
-    AuthorBrief:
-      type: object
-      description: 作者的简单信息.
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectID'
-        name:
-          type: string
-        nickname:
-          type: string
-      required: 
-        - id
     RsrcTagBrief:
       type: object
       description: 资源标签的简单形式.
@@ -816,6 +807,38 @@ components:
       description: 不可重复.
       minLength: 1
       maxLength: 25
+    SimpleVersion:
+      type: object
+      description: 简单的版本描述符.
+      properties:
+        origin: 
+          $ref: '#/components/schemas/ObjectID'
+        serial:
+          $ref: '#/components/schemas/VersionSerial'
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+      required: 
+        - origin
+        - serial
+        - creator
+    VersionSerial:
+      type: integer
+      format: int32
+      description: |
+        版本对应的序号.
+      minimum: 0
+    AccountBrief:
+      type: object
+      description: 账户的简单信息.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
     MgmtDescriptionField:
       type: string
       description: 用于管理的描述信息.
