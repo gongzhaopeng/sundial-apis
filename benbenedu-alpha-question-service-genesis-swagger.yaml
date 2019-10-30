@@ -852,6 +852,7 @@ components:
           maxLength: 250
       required: 
         - id
+        - version
         - mediaType
         - contentNumber
         - contentUrl
