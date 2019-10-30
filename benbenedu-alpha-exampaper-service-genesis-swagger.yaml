@@ -201,7 +201,10 @@ paths:
       tags: 
         - ExamPaperMold
       summary: 获取指定的试卷模子详情.
-      description: 获取指定的试卷模子详情.
+      description: |
+        获取指定的试卷模子详情.  
+        若未指定版本,则从主库中查找.  
+        若指定了版本,则从档案库中查找.
       operationId: getEpMoldById
       parameters: 
         - name: epmold-id
@@ -210,6 +213,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ObjectID'
+        - name: version
+          in: query
+          description: 指定试卷模子的版本序号.
+          required: false
+          schema:
+            $ref: '#/components/schemas/VersionSerial'
       responses:
         '200':
           description: 获取成功.
@@ -230,7 +239,14 @@ paths:
       tags:
         - ExamPaperMold
       summary: 更新指定试卷模子的设计.
-      description: 更新指定试卷模子的设计.
+      description: |
+        更新指定试卷模子的设计.  
+        
+        若当前状态为Developing, 则直接更新主库中相应对象的对应信息.  
+        若当前状态为Usable, 则对主库中相应的对象做如下操作  
+          1. 更新状态为Developing
+          2. 递增version.serial并更新version.creator
+          3. 更新请求中的对应信息
       operationId: updateEpMoldById
       parameters: 
         - name: epmold-id
@@ -282,7 +298,7 @@ paths:
                   value:
                     code: 'AlteringNotAllowed'
                     detail: '${detail}'
-                  description: '更改仅在Developing状态下被允许.'
+                  description: '更改仅在非Discarded状态下被允许.'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -291,7 +307,14 @@ paths:
       tags: 
         - ExamPaperMold
       summary: 更新指定试卷模子的状态.
-      description: 更新指定试卷模子的状态.
+      description: |
+        更新指定试卷模子的状态.  
+        
+        若从Developing更新到Usable, 则执行如下操作
+          1. 将状态从Developing更新到Usable
+          2. 在档案库中创建主库中当前试卷模子的副本
+        
+        对于其它允许的状态转移路径,则仅需修改主库中当前试卷模子的状态.
       operationId: updateEpmStateById
       parameters: 
         - name: epmold-id
@@ -332,7 +355,7 @@ paths:
                   value:
                     code: 'SpecifiedStateConversionNotAllowed'
                     detail: '${detail}'
-                  description: '允许的状态转换路径: Developing->Usable->Discarded'
+                  description: '允许的状态转换路径: Developing->{Usable,Discarded}, Usable->{Discarded}'
       security:
         - exampaperRepoAuth: 
           - client:inner
@@ -341,7 +364,11 @@ paths:
       tags: 
         - ExamPaperMold
       summary: 更新指定试卷模子的标签集.
-      description: 更新指定试卷模子的标签集.
+      description: |
+        更新指定试卷模子的标签集.
+        
+        若当前状态为Usable,则需同时更新主库和档案库中当前版本试卷模子的标签集.  
+        若为其它状态,则仅需更新主库中的试卷模子.
       operationId: updateEpmTagsById
       parameters: 
         - name: epmold-id
@@ -526,6 +553,8 @@ components:
       type: object
       description: 试卷模子的设计信息.
       properties:
+        yieldingMode:
+          $ref: '#/components/schemas/EpmYieldingMode'
         title:
           $ref: '#/components/schemas/EpTitle'
         description:
@@ -541,6 +570,7 @@ components:
         resources:
           $ref: '#/components/schemas/EpResources'
       required: 
+        - yieldingMode
         - title
         - epsGenerators
     EpMoldCreatedResp:
@@ -568,6 +598,13 @@ components:
           items:
             $ref: '#/components/schemas/EpmState'
           description: 指定state所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+        yieldingMode:
+          type: array
+          items:
+            $ref: '#/components/schemas/EpmYieldingMode'
+          description: 指定yieldingMode所属的集合. =relation=>in.
           minLength: 1
           maxLength: 10
         title:
@@ -643,10 +680,13 @@ components:
           $ref: '#/components/schemas/EpAdmissionTicket'
         epmId:
           $ref: '#/components/schemas/ObjectID'
+        epmVersion:
+          $ref: '#/components/schemas/VersionSerial'
         mark:
           $ref: '#/components/schemas/EpMark'
       required: 
         - epmId
+        - epmVersion
     ExamPaperCreatedResp:
       type: object
       description: 试卷创建成功时的响应.
@@ -671,6 +711,8 @@ components:
           $ref: '#/components/schemas/IdAnyMatchQueryField'
         epmId:
           $ref: '#/components/schemas/IdAnyMatchQueryField'
+        epmVersion:
+          $ref: '#/components/schemas/VersionQueryField'
         mark:
           $ref: '#/components/schemas/TextSearchSpec'
         title:
@@ -701,7 +743,7 @@ components:
           format: int64
           description: 创建时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
         title:
           $ref: '#/components/schemas/EpmTagTitle'
         description:
@@ -713,7 +755,11 @@ components:
         - title
     ExamPaperMold:
       type: object
-      description: 试卷模子.
+      description: |
+        试卷模子.  
+        
+        当yieldingMode为Definite时,下属的EpmEpsGenerator只能为确定型的.  
+        当yieldingMode为Dynamic时,对下属的EpmEpsGenerator没有限制.
       properties:
         id:
           $ref: '#/components/schemas/ObjectID'
@@ -726,9 +772,13 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
+        version:
+          $ref: '#/components/schemas/SimpleVersion'
         state:
           $ref: '#/components/schemas/EpmState'
+        yieldingMode:
+          $ref: '#/components/schemas/EpmYieldingMode'
         title:
           $ref: '#/components/schemas/EpTitle'
         description:
@@ -753,7 +803,9 @@ components:
         - createTime
         - lUTime
         - author
+        - version
         - state
+        - yieldingMode
         - title
         - epsGenerators
     EpmState:
@@ -763,6 +815,14 @@ components:
         - Developing
         - Usable
         - Discarded
+      minLength: 1
+      maxLength: 50
+    EpmYieldingMode:
+      type: string
+      description: 试卷模子的试卷产出模式.
+      enum:
+        - Definite
+        - Dynamic
       minLength: 1
       maxLength: 50
     EpTitle:
@@ -898,6 +958,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/SimpleVersion'
         title:
           $ref: '#/components/schemas/EpQuestionTitle'
         compositeEpQunit:
@@ -906,6 +968,7 @@ components:
           $ref: '#/components/schemas/EpQuestionDifficulty'
       required: 
         - id
+        - version
         - title
         - compositeEpQunit
     EpQuestionTitle:
@@ -1069,6 +1132,8 @@ components:
           $ref: '#/components/schemas/EpAdmissionTicket'
         epmId:
           $ref: '#/components/schemas/ObjectID'
+        epmVersion:
+          $ref: '#/components/schemas/VersionSerial'
         mark:
           $ref: '#/components/schemas/EpMark'
         title:
@@ -1091,6 +1156,7 @@ components:
         - createTime
         - admissionTicket
         - epmId
+        - epmVersion
         - title
         - sections
     EpAdmissionTicket:
@@ -1153,6 +1219,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
         mediaType:
           $ref: '#/components/schemas/MediaTypeField'
         contents:
@@ -1163,6 +1231,7 @@ components:
           maxLength: 5
       required: 
         - id
+        - version
         - mediaType
         - contents
     ResourceContentBrief:
@@ -1216,6 +1285,13 @@ components:
       description: 指定的id集合. =relation=>all-match.
       minLength: 1
       maxLength: 50
+    VersionQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersionSerial'
+      description: 指定version序号的集合. =relation=>in.
+      minLength: 1
+      maxLength: 10
     TimeQueryField:
       type: array
       items:
@@ -1246,9 +1322,29 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
-    AuthorBrief:
+    SimpleVersion:
       type: object
-      description: 作者的简单信息.
+      description: 简单的版本描述符.
+      properties:
+        origin: 
+          $ref: '#/components/schemas/ObjectID'
+        serial:
+          $ref: '#/components/schemas/VersionSerial'
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+      required: 
+        - origin
+        - serial
+        - creator
+    VersionSerial:
+      type: integer
+      format: int32
+      description: |
+        版本对应的序号.
+      minimum: 0
+    AccountBrief:
+      type: object
+      description: 账户的简单信息.
       properties:
         id:
           $ref: '#/components/schemas/ObjectID'
