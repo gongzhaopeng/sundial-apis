@@ -538,6 +538,8 @@ components:
           maxLength: 20
         tags:
           $ref: '#/components/schemas/IdAllMatchQueryField'
+        resourceRefs:
+          $ref: '#/components/schemas/VersioningRefQueryField'
     QuestionPage:
       description: 题目分页.
       allOf:
@@ -628,6 +630,13 @@ components:
           description: 标签集.用于管理.
           items:
             $ref: '#/components/schemas/QTagBrief'
+        resourceRefs:
+          type: array
+          description: |
+            资源引用表.  
+            该属性仅用于后台维护引用关系, 不对外暴露.
+          items:
+            $ref: '#/components/schemas/VersioningRef'
       required: 
         - id
         - createTime
@@ -833,6 +842,13 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
+    VersioningRefQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersioningRef'
+      description: 指定的VersioningRef集合. =relation=>all.
+      minLength: 1
+      maxLength: 10
     ResourceBrief:
       type: object
       description: 资源的简单形式.
@@ -856,6 +872,16 @@ components:
         - mediaType
         - contentNumber
         - contentUrl
+    VersioningRef:
+      type: object
+      description: 带版本的引用描述符.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
+      required:
+        - id
     SimpleVersion:
       type: object
       description: 简单的版本描述符.
