@@ -517,6 +517,39 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /examdeliveries/query:
+    post:
+      tags: 
+        - ExamDelivery
+      summary: Query考试递送任务.
+      description: Query考试递送任务.
+      operationId: queryExamDeliveryTasks
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamDeliveryTaskQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamDeliveryTaskPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /examdeliveries/{exam-id}:
     get:
       tags: 
@@ -566,6 +599,39 @@ paths:
       responses:
         '202':
           description: Accepted.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /echaindeliveries/query:
+    post:
+      tags: 
+        - EchainDelivery
+      summary: Query考试链递送任务.
+      description: Query考试链递送任务.
+      operationId: queryEchainDeliveryTasks
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchainDeliveryTaskQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchainDeliveryTaskPage'
         '400':
           description: Bad Request.
         '401':
@@ -836,6 +902,32 @@ components:
           $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
       required:
         - examId
+    ExamDeliveryTaskQuery:
+      type: object
+      description: 考试递送任务查询描述对象.
+      properties:
+        examId:
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
+        performingState:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskPerformingState'
+          description: 指定performingState所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+    ExamDeliveryTaskPage:
+      description: 考试递送任务分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExamDeliveryTask'
+              minLength: 0
+          required:
+            - content
     EchainDeliveryDefinition:
       type: object
       description: 提交考试链递送任务的请求信息.
@@ -846,6 +938,32 @@ components:
           $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
       required:
         - echainId
+    EchainDeliveryTaskQuery:
+      type: object
+      description: 考试链递送任务查询描述对象.
+      properties:
+        echainId:
+          $ref: '#/components/schemas/IdAnyMatchQueryField'
+        performingState:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskPerformingState'
+          description: 指定performingState所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+    EchainDeliveryTaskPage:
+      description: 考试链递送任务分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EchainDeliveryTask'
+              minLength: 0
+          required:
+            - content
     ExamStation:
       type: object
       description: 考试站.
