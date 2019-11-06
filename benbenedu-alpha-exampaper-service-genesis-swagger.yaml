@@ -977,7 +977,7 @@ components:
         id:
           $ref: '#/components/schemas/ObjectID'
         version:
-          $ref: '#/components/schemas/SimpleVersion'
+          $ref: '#/components/schemas/VersionSerial'
         title:
           $ref: '#/components/schemas/EpQuestionTitle'
         compositeEpQunit:
