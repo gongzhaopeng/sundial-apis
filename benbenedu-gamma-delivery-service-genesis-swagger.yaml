@@ -489,6 +489,103 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /epmdeliveries:
+    post:
+      tags:
+        - EpMoldDelivery
+      summary: 提交试卷模子递送任务.
+      description: |  
+        提交试卷模子递送任务.
+        若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
+        任务自动执行.
+      operationId: submitEpmDelivery
+      requestBody:
+        description: 提交的试卷模子递送任务信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldDeliveryDefinition'
+      responses:
+        '202':
+          description: Accepted.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epmdeliveries/query:
+    post:
+      tags: 
+        - EpMoldDelivery
+      summary: Query试卷模子递送任务.
+      description: Query试卷模子递送任务.
+      operationId: queryEpmDeliveryTasks
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldDeliveryTaskQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldDeliveryTaskPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epmdeliveries/{epm-id}/{version}:
+    get:
+      tags: 
+        - EpMoldDelivery
+      summary: 获取指定试卷模子对应的递送任务.
+      description: 获取指定试卷模子对应的递送任务.
+      operationId: getEpmDeliveryTaskByVersionedEpm
+      parameters: 
+        - name: epm-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+        - name: version
+          in: path
+          description: 指定试卷模子的版本.
+          required: true
+          schema:
+            $ref: '#/components/schemas/VersionSerial'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldDeliveryTask'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定试卷模子对应的递送任务不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /examdeliveries:
     post:
       tags:
@@ -892,6 +989,42 @@ components:
       type: boolean
       description: '值为false时,若任务的当前执行状态处于Performing, 则不允许发起新的执行. 值为true时,则不论任务的当前执行状态为何,强行发起新的执行.'
       default: false
+    EpMoldDeliveryDefinition:
+      type: object
+      description: 提交试卷模子递送任务的请求信息.
+      properties:
+        epMold:
+          $ref: '#/components/schemas/VersioningRef'
+        force:
+          $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
+      required:
+        - epMold
+    EpMoldDeliveryTaskQuery:
+      type: object
+      description: 试卷模子递送任务查询描述对象.
+      properties:
+        epMold:
+          $ref: '#/components/schemas/VersioningRefQueryField'
+        performingState:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskPerformingState'
+          description: 指定performingState所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+    EpMoldDeliveryTaskPage:
+      description: 试卷模子递送任务分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EpMoldDeliveryTask'
+              minLength: 0
+          required:
+            - content
     ExamDeliveryDefinition:
       type: object
       description: 提交考试递送任务的请求信息.
@@ -1164,6 +1297,28 @@ components:
       description: 标记.
       minLength: 1
       maxLength: 200
+    EpMoldDeliveryTask:
+      type: object
+      description: 试卷模子递送任务.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        epMold:
+          $ref: '#/components/schemas/VersioningRef'
+        lBeginTime:
+           $ref: '#/components/schemas/Timestamp'
+        lFinishTime:
+           $ref: '#/components/schemas/Timestamp'
+        performingState:
+          $ref: '#/components/schemas/DeliveryTaskPerformingState'
+        performingLogs:
+          type: array
+          items:
+            type: string
+          description: 执行logs.
+      required: 
+        - id
+        - epMold
     ExamDeliveryTask:
       type: object
       description: 考试递送任务. 
@@ -1303,6 +1458,29 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
+    VersioningRefQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersioningRef'
+      description: 指定的VersioningRef集合. =relation=>all.
+      minLength: 1
+      maxLength: 10
+    VersioningRef:
+      type: object
+      description: 带版本的引用描述符.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
+      required:
+        - id
+    VersionSerial:
+      type: integer
+      format: int32
+      description: |
+        版本对应的序号.
+      minimum: 0
     AccountBrief:
       type: object
       description: 作者的简单信息.
