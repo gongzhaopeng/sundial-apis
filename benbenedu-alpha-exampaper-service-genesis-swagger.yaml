@@ -1405,6 +1405,8 @@ components:
       properties:
         resourceId:
           $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
         mediaType:
           $ref: '#/components/schemas/MediaTypeField'
         value:
