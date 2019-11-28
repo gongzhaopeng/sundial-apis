@@ -859,19 +859,54 @@ components:
           $ref: '#/components/schemas/VersionSerial'
         mediaType:
           $ref: '#/components/schemas/MediaTypeField'
-        contentNumber:
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceContentBrief'
+          minLength: 1
+          maxLength: 5
+      required: 
+        - id
+        - version
+        - mediaType
+        - contents
+    ResourceContentBrief:
+      type: object
+      description: 资源内容摘要.
+      properties:
+        number:
           $ref: '#/components/schemas/NumberField'
-        contentUrl:
+        quality:
+          $ref: '#/components/schemas/ResourceContentQuality'
+        size:
+          type: integer
+          format: int32
+          description: File size in bytes.
+        duration:
+          type: integer
+          format: int32
+          description: The duration.
+        height:
+          type: integer
+          format: int32
+        width:
+          type: integer
+          format: int32
+        url:
           type: string
           description: 资源内容的实际访问地址.
           minLength: 1
           maxLength: 250
       required: 
-        - id
-        - version
-        - mediaType
-        - contentNumber
-        - contentUrl
+        - number
+        - size
+        - url
+    ResourceContentQuality:
+      type: integer
+      format: int32
+      description: 质量等级.
+      minimum: 1
+      maximum: 10
     VersioningRef:
       type: object
       description: 带版本的引用描述符.
