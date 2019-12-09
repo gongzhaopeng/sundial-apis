@@ -41,6 +41,6 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sundial.benbenedu.cn:9001/account/oauth/token"
+          tokenUrl: "http://sundial.benbenedu.cn:9001/authdev/oauth/token"
           scopes:
             'client:inner': 内网客户端
