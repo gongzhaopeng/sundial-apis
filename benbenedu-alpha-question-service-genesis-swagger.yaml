@@ -199,7 +199,10 @@ paths:
       tags: 
         - Question
       summary: 获取指定的题目详情.
-      description: 获取指定的题目详情.
+      description: |
+        获取指定的题目详情.  
+        若未指定版本,则从主库中查找.  
+        若指定了版本,则从档案库中查找.
       operationId: getQuestionById
       parameters: 
         - name: question-id
@@ -208,6 +211,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ObjectID'
+        - name: version
+          in: query
+          description: 指定题目的版本序号.
+          required: false
+          schema:
+            $ref: '#/components/schemas/VersionSerial'
       responses:
         '200':
           description: 获取成功.
@@ -228,7 +237,13 @@ paths:
       tags:
         - Question
       summary: 更新指定题目的设计.
-      description: 更新指定题目的设计.
+      description: |
+        更新指定题目的设计.  
+        若当前状态为Developing, 则直接更新主库中相应对象的对应信息.  
+        若当前状态为Usable, 则对主库中相应的对象做如下操作  
+          1. 更新状态为Developing
+          2. 递增version.serial并更新version.creator
+          3. 更新请求中的对应信息
       operationId: updateQuestionById
       parameters: 
         - name: question-id
@@ -254,6 +269,7 @@ paths:
           description: Forbidden.
         '404':
           description: 指定的题目不存在.
+          
         '409':
           description: Conflict.
           content:
@@ -280,7 +296,7 @@ paths:
                   value:
                     code: 'AlteringNotAllowed'
                     detail: '${detail}'
-                  description: '更改仅在Developing状态下被允许.'
+                  description: '更改仅在非Discarded状态下被允许.'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -289,7 +305,14 @@ paths:
       tags: 
         - Question
       summary: 更新指定题目的状态.
-      description: 更新指定题目的状态.
+      description: |
+        更新指定题目的状态.  
+        
+        若从Developing更新到Usable, 则执行如下操作
+          1. 将状态从Developing更新到Usable
+          2. 在档案库中创建主库中当前题目的副本
+        
+        对于其它允许的状态转移路径,则仅需修改主库中当前题目的状态.
       operationId: updateQuestionStateById
       parameters: 
         - name: question-id
@@ -330,7 +353,7 @@ paths:
                   value:
                     code: 'SpecifiedStateConversionNotAllowed'
                     detail: '${detail}'
-                  description: '允许的状态转换路径: Developing->Usable->Discarded'
+                  description: '允许的状态转换路径: Developing->{Usable,Discarded}, Usable->{Discarded}'
       security:
         - questionRepoAuth: 
           - client:inner
@@ -339,7 +362,11 @@ paths:
       tags: 
         - Question
       summary: 更新指定题目的标签集.
-      description: 更新指定题目的标签集.
+      description: |
+        更新指定题目的标签集.
+        
+        若当前状态为Usable,则需同时更新主库和档案库中当前版本题目的标签集.  
+        若为其它状态,则仅需更新主库中的题目.
       operationId: updateQuestionTagsById
       parameters: 
         - name: question-id
@@ -437,7 +464,7 @@ components:
           format: int64
           description: 创建时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
         title:
           $ref: '#/components/schemas/QTagTitle'
         description:
@@ -511,6 +538,8 @@ components:
           maxLength: 20
         tags:
           $ref: '#/components/schemas/IdAllMatchQueryField'
+        resourceRefs:
+          $ref: '#/components/schemas/VersioningRefQueryField'
     QuestionPage:
       description: 题目分页.
       allOf:
@@ -583,7 +612,9 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         author:
-          $ref: '#/components/schemas/AuthorBrief'
+          $ref: '#/components/schemas/AccountBrief'
+        version:
+          $ref: '#/components/schemas/SimpleVersion'
         state:
           $ref: '#/components/schemas/QuestionState'
         title:
@@ -599,11 +630,19 @@ components:
           description: 标签集.用于管理.
           items:
             $ref: '#/components/schemas/QTagBrief'
+        resourceRefs:
+          type: array
+          description: |
+            资源引用表.  
+            该属性仅用于后台维护引用关系, 不对外暴露.
+          items:
+            $ref: '#/components/schemas/VersioningRef'
       required: 
         - id
         - createTime
         - lUTime
         - author
+        - version
         - state
         - title
         - compositeQunit
@@ -803,9 +842,104 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
-    AuthorBrief:
+    VersioningRefQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersioningRef'
+      description: 指定的VersioningRef集合. =relation=>all.
+      minLength: 1
+      maxLength: 10
+    ResourceBrief:
       type: object
-      description: 作者的简单信息.
+      description: 资源的简单形式.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
+        mediaType:
+          $ref: '#/components/schemas/MediaTypeField'
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceContentBrief'
+          minLength: 1
+          maxLength: 5
+      required: 
+        - id
+        - version
+        - mediaType
+        - contents
+    ResourceContentBrief:
+      type: object
+      description: 资源内容摘要.
+      properties:
+        number:
+          $ref: '#/components/schemas/NumberField'
+        quality:
+          $ref: '#/components/schemas/ResourceContentQuality'
+        size:
+          type: integer
+          format: int32
+          description: File size in bytes.
+        duration:
+          type: integer
+          format: int32
+          description: The duration.
+        height:
+          type: integer
+          format: int32
+        width:
+          type: integer
+          format: int32
+        url:
+          type: string
+          description: 资源内容的实际访问地址.
+          minLength: 1
+          maxLength: 250
+      required: 
+        - number
+        - size
+        - url
+    ResourceContentQuality:
+      type: integer
+      format: int32
+      description: 质量等级.
+      minimum: 1
+      maximum: 10
+    VersioningRef:
+      type: object
+      description: 带版本的引用描述符.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
+      required:
+        - id
+    SimpleVersion:
+      type: object
+      description: 简单的版本描述符.
+      properties:
+        origin: 
+          $ref: '#/components/schemas/ObjectID'
+        serial:
+          $ref: '#/components/schemas/VersionSerial'
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+      required: 
+        - origin
+        - serial
+        - creator
+    VersionSerial:
+      type: integer
+      format: int32
+      description: |
+        版本对应的序号.
+      minimum: 0
+    AccountBrief:
+      type: object
+      description: 账户的简单信息.
       properties:
         id:
           $ref: '#/components/schemas/ObjectID'
@@ -815,26 +949,6 @@ components:
           type: string
       required: 
         - id
-    ResourceBrief:
-      type: object
-      description: 资源的简单形式.
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectID'
-        mediaType:
-          $ref: '#/components/schemas/MediaTypeField'
-        contentNumber:
-          $ref: '#/components/schemas/NumberField'
-        contentUrl:
-          type: string
-          description: 资源内容的实际访问地址.
-          minLength: 1
-          maxLength: 250
-      required: 
-        - id
-        - mediaType
-        - contentNumber
-        - contentUrl
     RichTextContentField:
       type: string
       description: 富文本编辑器输出的内容.
@@ -950,7 +1064,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sundial.benbenedu.cn:9001/account/oauth/token"
+          tokenUrl: "http://sundial.benbenedu.cn:9001/xauth/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:

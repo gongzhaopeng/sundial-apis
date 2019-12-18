@@ -17,6 +17,8 @@ tags:
     description: 访问考试站.
   - name: ExamPaperDelivery
     description: 访问试卷递送信息.
+  - name: EpMoldDelivery
+    description: 访问试卷模子递送信息
   - name: ExamDelivery
     description: 访问考试递送信息.
   - name: EchainDelivery
@@ -487,12 +489,112 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
+  /epmdeliveries:
+    post:
+      tags:
+        - EpMoldDelivery
+      summary: 提交试卷模子递送任务.
+      description: |  
+        提交试卷模子递送任务.
+        若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
+        任务自动执行.
+      operationId: submitEpmDelivery
+      requestBody:
+        description: 提交的试卷模子递送任务信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldDeliveryDefinition'
+      responses:
+        '202':
+          description: Accepted.
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epmdeliveries/query:
+    post:
+      tags: 
+        - EpMoldDelivery
+      summary: Query试卷模子递送任务.
+      description: Query试卷模子递送任务.
+      operationId: queryEpmDeliveryTasks
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageSortWithDefaultLUTimeDesc'
+      requestBody:
+        description: 查询描述.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpMoldDeliveryTaskQuery'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldDeliveryTaskPage'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - deliveryAuth: 
+          - client:inner
+  /epmdeliveries/{epm-id}/{version}:
+    get:
+      tags: 
+        - EpMoldDelivery
+      summary: 获取指定试卷模子对应的递送任务.
+      description: 获取指定试卷模子对应的递送任务.
+      operationId: getEpmDeliveryTaskByVersionedEpm
+      parameters: 
+        - name: epm-id
+          in: path
+          description: 指定试卷模子的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+        - name: version
+          in: path
+          description: 指定试卷模子的版本.
+          required: true
+          schema:
+            $ref: '#/components/schemas/VersionSerial'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpMoldDeliveryTask'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定试卷模子对应的递送任务不存在.
+      security:
+        - deliveryAuth: 
+          - client:inner
   /examdeliveries:
     post:
       tags:
         - ExamDelivery
       summary: 提交考试递送任务.
-      description: 提交考试递送任务.
+      description: |  
+        提交考试递送任务.
+        若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
+        任务自动执行.
       operationId: submitExamDelivery
       requestBody:
         description: 提交的考试递送任务信息.
@@ -501,12 +603,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ExamDeliveryDefinition'
       responses:
-        '201':
-          description: 提交成功.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExamDeliveryTaskCreatedResp'
+        '202':
+          description: Accepted.
         '400':
           description: Bad Request.
         '401':
@@ -549,17 +647,17 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
-  /examdeliveries/{examdelivery-id}:
+  /examdeliveries/{exam-id}:
     get:
       tags: 
         - ExamDelivery
-      summary: 获取指定的考试递送任务.
-      description: 获取指定的考试递送任务.
-      operationId: getExamDeliveryTaskById
+      summary: 获取指定考试对应的递送任务.
+      description: 获取指定考试对应的递送任务.
+      operationId: getExamDeliveryTaskByExamId
       parameters: 
-        - name: examdelivery-id
+        - name: exam-id
           in: path
-          description: 指定考试递送任务的ID.
+          description: 指定考试的ID.
           required: true
           schema:
             $ref: '#/components/schemas/ObjectID'
@@ -575,137 +673,7 @@ paths:
         '403':
           description: Forbidden.
         '404':
-          description: 指定的考试递送任务不存在.
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /examdeliveries/{examdelivery-id}/state:
-    put:
-      tags: 
-        - ExamDelivery
-      summary: 更新指定考试递送任务的状态.
-      description: 更新指定考试递送任务的状态.
-      operationId: updateExamDeliveryTaskStateById
-      parameters: 
-        - name: examdelivery-id
-          in: path
-          description: 指定考试递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      requestBody:
-        description: 考试递送任务状态更新请求信息.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeliveryTaskStateUpdatingReq'
-      responses:
-        '204':
-          description: 考试递送任务状态更新成功.
-        '400':
-          description: Bad Request.
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试递送任务不存在.
-        '428':
-          description: Precondition Required.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                lUTimeConflict:
-                  value:
-                    code: 'LUTimeConflict'
-                    detail: '${detail}'
-                specifiedStateConversionNotAllowed:
-                  value:
-                    code: 'SpecifiedStateConversionNotAllowed'
-                    detail: '${detail}'
-                  description: '允许的状态转换路径: Active->{Inactive, Deleted}, Inactive->{Active, Deleted}'
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /examdeliveries/{examdelivery-id}/performing:
-    post:
-      tags: 
-        - ExamDelivery
-      summary: 执行指定的考试递送任务.
-      description: '执行指定的考试递送任务.仅当任务处于Active状态时,才允许执行该任务.'
-      operationId: performExamDeliveryTaskById
-      parameters: 
-        - name: examdelivery-id
-          in: path
-          description: 指定考试递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      requestBody:
-        description: 考试递送任务执行请求信息.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeliveryTaskPerformingReq'
-      responses:
-        '202':
-          description: Accepted.
-        '400':
-          description: Bad Request.
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试递送任务不存在.
-        '428':
-          description: Precondition Required.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                lUTimeConflict:
-                  value:
-                    code: 'LUTimeConflict'
-                    detail: '${detail}'
-                taskNonPerformable:
-                  value:
-                    code: 'TaskNonPerformable'
-                    detail: '${detail}'
-                  description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /examdeliveries/{examdelivery-id}/publication/status:
-    get:
-      tags:
-        - ExamDelivery
-      summary: 获取考试递送任务对应的发行物的状态.
-      description: 获取考试递送任务对应的发行物的状态.
-      operationId: getExamPubStatusById
-      parameters: 
-        - name: examdelivery-id
-          in: path
-          description: 指定考试递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      responses:
-        '200':
-          description: 获取成功.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicationStatus'
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试递送任务不存在.
+          description: 指定考试对应的递送任务不存在.
       security:
         - deliveryAuth: 
           - client:inner
@@ -714,7 +682,10 @@ paths:
       tags:
         - EchainDelivery
       summary: 提交考试链递送任务.
-      description: 提交考试链递送任务.
+      description: |  
+        提交考试链递送任务.
+        若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
+        任务自动执行.
       operationId: submitEchainDelivery
       requestBody:
         description: 提交的考试链递送任务信息.
@@ -723,12 +694,8 @@ paths:
             schema:
               $ref: '#/components/schemas/EchainDeliveryDefinition'
       responses:
-        '201':
-          description: 提交成功.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EchainDeliveryTaskCreatedResp'
+        '202':
+          description: Accepted.
         '400':
           description: Bad Request.
         '401':
@@ -771,17 +738,17 @@ paths:
       security:
         - deliveryAuth: 
           - client:inner
-  /echaindeliveries/{echaindelivery-id}:
+  /echaindeliveries/{echain-id}:
     get:
       tags: 
         - EchainDelivery
-      summary: 获取指定的考试链递送任务.
-      description: 获取指定的考试链递送任务.
-      operationId: getEchainDeliveryTaskById
+      summary: 获取指定考试链对应的递送任务.
+      description: 获取指定考试链对应的递送任务.
+      operationId: getEchainDeliveryTaskByEchainId
       parameters: 
-        - name: echaindelivery-id
+        - name: echain-id
           in: path
-          description: 指定考试链递送任务的ID.
+          description: 指定考试链的ID.
           required: true
           schema:
             $ref: '#/components/schemas/ObjectID'
@@ -797,137 +764,7 @@ paths:
         '403':
           description: Forbidden.
         '404':
-          description: 指定的考试链递送任务不存在.
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /echaindeliveries/{echaindelivery-id}/state:
-    put:
-      tags: 
-        - EchainDelivery
-      summary: 更新指定考试链递送任务的状态.
-      description: 更新指定考试链递送任务的状态.
-      operationId: updateEchainDeliveryTaskStateById
-      parameters: 
-        - name: echaindelivery-id
-          in: path
-          description: 指定考试链递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      requestBody:
-        description: 考试链递送任务状态更新请求信息.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeliveryTaskStateUpdatingReq'
-      responses:
-        '204':
-          description: 考试链递送任务状态更新成功.
-        '400':
-          description: Bad Request.
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试链递送任务不存在.
-        '428':
-          description: Precondition Required.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                lUTimeConflict:
-                  value:
-                    code: 'LUTimeConflict'
-                    detail: '${detail}'
-                specifiedStateConversionNotAllowed:
-                  value:
-                    code: 'SpecifiedStateConversionNotAllowed'
-                    detail: '${detail}'
-                  description: '允许的状态转换路径: Active->{Inactive, Deleted}, Inactive->{Active, Deleted}'
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /echaindeliveries/{echaindelivery-id}/performing:
-    post:
-      tags: 
-        - EchainDelivery
-      summary: 执行指定的考试链递送任务.
-      description: '执行指定的考试链递送任务.仅当任务处于Active状态时,才允许执行该任务.'
-      operationId: performEchainDeliveryTaskById
-      parameters: 
-        - name: echaindelivery-id
-          in: path
-          description: 指定考试链递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      requestBody:
-        description: 考试链递送任务执行请求信息.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeliveryTaskPerformingReq'
-      responses:
-        '202':
-          description: Accepted.
-        '400':
-          description: Bad Request.
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试链递送任务不存在.
-        '428':
-          description: Precondition Required.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                lUTimeConflict:
-                  value:
-                    code: 'LUTimeConflict'
-                    detail: '${detail}'
-                taskNonPerformable:
-                  value:
-                    code: 'TaskNonPerformable'
-                    detail: '${detail}'
-                  description: '对应以下几种情况: a. 任务未处于Active状态; b. 任务的当前执行状态为Performing且请求参数force的值为false.'
-      security:
-        - deliveryAuth: 
-          - client:inner
-  /echaindeliveries/{echaindelivery-id}/publication/status:
-    get:
-      tags:
-        - EchainDelivery
-      summary: 获取考试链递送任务对应的发行物的状态.
-      description: 获取考试链递送任务对应的发行物的状态.
-      operationId: getEchainPubStatusById
-      parameters: 
-        - name: echaindelivery-id
-          in: path
-          description: 指定考试链递送任务的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      responses:
-        '200':
-          description: 获取成功.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicationStatus'
-        '401':
-          description: Unauthorized.
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的考试链递送任务不存在.
+          description: 指定的考试链对应的递送任务不存在.
       security:
         - deliveryAuth: 
           - client:inner
@@ -1145,83 +982,65 @@ components:
           format: int64
           description: 最近一次更新时间(timestamp).
         force:
-          type: boolean
-          description: '值为false时,若任务的当前执行状态处于Performing, 则不允许发起新的执行. 值为true时,则不论任务的当前执行状态为何,强行发起新的执行.'
-          default: false
+          $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
       required: 
         - deliveryTaskLUTime
+    DeliveryTaskForcePerformingIndicator:
+      type: boolean
+      description: '值为false时,若任务的当前执行状态处于Performing, 则不允许发起新的执行. 值为true时,则不论任务的当前执行状态为何,强行发起新的执行.'
+      default: false
+    EpMoldDeliveryDefinition:
+      type: object
+      description: 提交试卷模子递送任务的请求信息.
+      properties:
+        epMold:
+          $ref: '#/components/schemas/VersioningRef'
+        force:
+          $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
+      required:
+        - epMold
+    EpMoldDeliveryTaskQuery:
+      type: object
+      description: 试卷模子递送任务查询描述对象.
+      properties:
+        epMold:
+          $ref: '#/components/schemas/VersioningRefQueryField'
+        performingState:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryTaskPerformingState'
+          description: 指定performingState所属的集合. =relation=>in.
+          minLength: 1
+          maxLength: 10
+    EpMoldDeliveryTaskPage:
+      description: 试卷模子递送任务分页.
+      allOf:
+        - $ref: '#/components/schemas/BasicPage'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EpMoldDeliveryTask'
+              minLength: 0
+          required:
+            - content
     ExamDeliveryDefinition:
       type: object
       description: 提交考试递送任务的请求信息.
       properties:
-        description:
-          $ref: '#/components/schemas/MgmtDescriptionField'
-        exam:
-          $ref: '#/components/schemas/ExamBrief'
-        examStation:
-          $ref: '#/components/schemas/ExamStationBrief'
-        autoPerform:
-          type: boolean
-          description: 是否自动执行.
-          default: false
-      required:
-        - exam
-        - examStation
-    ExamDeliveryTaskCreatedResp:
-      type: object
-      description: 考试递送任务提交成功时的响应.
-      properties:
-        id:
+        examId:
           $ref: '#/components/schemas/ObjectID'
-      required: 
-        - id
+        force:
+          $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
+      required:
+        - examId
     ExamDeliveryTaskQuery:
       type: object
       description: 考试递送任务查询描述对象.
       properties:
-        id: 
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        createTime:
-          $ref: '#/components/schemas/TimeQueryField'
-        lUTime:
-          $ref: '#/components/schemas/TimeQueryField'
-        creator:
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        state:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeliveryTaskState'
-          description: 指定state所属的集合. =relation=>in.
-          minLength: 1
-          maxLength: 10
-        description:
-          $ref: '#/components/schemas/TextSearchSpec'
         examId:
           $ref: '#/components/schemas/IdAnyMatchQueryField'
-        examForm:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExamForm'
-          description: 指定examForm所属的集合. =relation=>in.
-          minLength: 1
-          maxLength: 10
-        examTitle:
-          $ref: '#/components/schemas/TextSearchSpec'
-        examBeginTime:
-          $ref: '#/components/schemas/TimeQueryField'
-        examStationId:
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        examStationName:
-          $ref: '#/components/schemas/TextSearchSpec'
-        examStationType:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExamStationType'
-          description: 指定examStationType所属的集合. =relation=>in.
-          minLength: 1
-          maxLength: 10
-        examStationHost:
-          $ref: '#/components/schemas/TextSearchSpec'
         performingState:
           type: array
           items:
@@ -1246,65 +1065,18 @@ components:
       type: object
       description: 提交考试链递送任务的请求信息.
       properties:
-        description:
-          $ref: '#/components/schemas/MgmtDescriptionField'
-        echain:
-          $ref: '#/components/schemas/EchainBrief'
-        examStation:
-          $ref: '#/components/schemas/ExamStationBrief'
-        autoPerform:
-          type: boolean
-          description: 是否自动执行.
-          default: false
-      required:
-        - exam
-        - examStation
-    EchainDeliveryTaskCreatedResp:
-      type: object
-      description: 考试链递送任务提交成功时的响应.
-      properties:
-        id:
+        echainId:
           $ref: '#/components/schemas/ObjectID'
-      required: 
-        - id
+        force:
+          $ref: '#/components/schemas/DeliveryTaskForcePerformingIndicator'
+      required:
+        - echainId
     EchainDeliveryTaskQuery:
       type: object
       description: 考试链递送任务查询描述对象.
       properties:
-        id: 
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        createTime:
-          $ref: '#/components/schemas/TimeQueryField'
-        lUTime:
-          $ref: '#/components/schemas/TimeQueryField'
-        creator:
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        state:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeliveryTaskState'
-          description: 指定state所属的集合. =relation=>in.
-          minLength: 1
-          maxLength: 10
-        description:
-          $ref: '#/components/schemas/TextSearchSpec'
         echainId:
           $ref: '#/components/schemas/IdAnyMatchQueryField'
-        echainTitle:
-          $ref: '#/components/schemas/TextSearchSpec'
-        examStationId:
-          $ref: '#/components/schemas/IdAnyMatchQueryField'
-        examStationName:
-          $ref: '#/components/schemas/TextSearchSpec'
-        examStationType:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExamStationType'
-          description: 指定examStationType所属的集合. =relation=>in.
-          minLength: 1
-          maxLength: 10
-        examStationHost:
-          $ref: '#/components/schemas/TextSearchSpec'
         performingState:
           type: array
           items:
@@ -1525,38 +1297,38 @@ components:
       description: 标记.
       minLength: 1
       maxLength: 200
+    EpMoldDeliveryTask:
+      type: object
+      description: 试卷模子递送任务.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        epMold:
+          $ref: '#/components/schemas/VersioningRef'
+        lBeginTime:
+           $ref: '#/components/schemas/Timestamp'
+        lFinishTime:
+           $ref: '#/components/schemas/Timestamp'
+        performingState:
+          $ref: '#/components/schemas/DeliveryTaskPerformingState'
+        performingLogs:
+          type: array
+          items:
+            type: string
+          description: 执行logs.
+      required: 
+        - id
+        - epMold
     ExamDeliveryTask:
       type: object
       description: 考试递送任务. 
       properties:
-        id:
+        examId:
           $ref: '#/components/schemas/ObjectID'
-        createTime:
-          type: integer
-          format: int64
-          description: 创建时间(timestamp).
-        lUTime:
-          type: integer
-          format: int64
-          description: 最近一次更新时间(timestamp).
-        creator:
-          $ref: '#/components/schemas/AccountBrief'
-        state:
-          $ref: '#/components/schemas/DeliveryTaskState'
-        description:
-          $ref: '#/components/schemas/MgmtDescriptionField'
-        exam:
-          $ref: '#/components/schemas/ExamBrief'
-        examStation:
-          $ref: '#/components/schemas/ExamStationBrief'
         lBeginTime:
-          type: integer
-          format: int64
-          description: 最近一次执行的开始时间(timestamp).
+           $ref: '#/components/schemas/Timestamp'
         lFinishTime:
-          type: integer
-          format: int64
-          description: 最近一次执行的结束时间(timestamp).
+           $ref: '#/components/schemas/Timestamp'
         performingState:
           $ref: '#/components/schemas/DeliveryTaskPerformingState'
         performingLogs:
@@ -1565,78 +1337,17 @@ components:
             type: string
           description: 执行logs.
       required: 
-        - id
-        - createTime
-        - lUTime
-        - creator
-        - state
-        - exam
-        - examStation
-    ExamBrief:
-      type: object
-      description: 考试的简单信息.
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectID'
-        form:
-          $ref: '#/components/schemas/ExamForm'
-        title:
-          $ref: '#/components/schemas/ExamTitle'
-        beginTime:
-          $ref: '#/components/schemas/ExamBeginTime'
-      required: 
-        - id
-        - form
-        - title
-    ExamForm:
-      type: string
-      description: 考试的形式.
-      enum:
-        - Enclosed
-        - Public
-      minLength: 1
-      maxLength: 50
-    ExamTitle:
-      type: string
-      description: 考试标题.
-      minLength: 1
-      maxLength: 200
-    ExamBeginTime:
-      type: integer
-      format: int64
-      description: 考试开始时间(timestamp).
+        - examId
     EchainDeliveryTask:
       type: object
       description: 考试链递送任务. 
       properties:
-        id:
+        echainId:
           $ref: '#/components/schemas/ObjectID'
-        createTime:
-          type: integer
-          format: int64
-          description: 创建时间(timestamp).
-        lUTime:
-          type: integer
-          format: int64
-          description: 最近一次更新时间(timestamp).
-        creator:
-          $ref: '#/components/schemas/AccountBrief'
-        state:
-          $ref: '#/components/schemas/DeliveryTaskState'
-        description:
-          $ref: '#/components/schemas/MgmtDescriptionField'
-        echain:
-          $ref: '#/components/schemas/EchainBrief'
-        examStation:
-          $ref: '#/components/schemas/ExamStationBrief'
         lBeginTime:
-          type: integer
-          format: int64
-          description: 最近一次执行的开始时间(timestamp).
+          $ref: '#/components/schemas/Timestamp'
         lFinishTime:
-          type: integer
-          format: int64
-          description: 最近一次执行的结束时间(timestamp).
+          $ref: '#/components/schemas/Timestamp'
         performingState:
           $ref: '#/components/schemas/DeliveryTaskPerformingState'
         performingLogs:
@@ -1645,29 +1356,7 @@ components:
             type: string
           description: 执行logs.
       required: 
-        - id
-        - createTime
-        - lUTime
-        - creator
-        - state
-        - echain
-        - examStation
-    EchainBrief:
-      type: object
-      description: 考试链的简单信息.
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectID'
-        title:
-          $ref: '#/components/schemas/EchainTitle'
-      required: 
-        - id
-        - title
-    EchainTitle:
-      type: string
-      description: 考试链标题.
-      minLength: 1
-      maxLength: 200
+        - echainId
     DeliveryTaskState:
       type: string
       description: 递送任务的状态.
@@ -1769,6 +1458,29 @@ components:
           description: =relation=>all.
           minLength: 1
           maxLength: 10
+    VersioningRefQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/VersioningRef'
+      description: 指定的VersioningRef集合. =relation=>all.
+      minLength: 1
+      maxLength: 10
+    VersioningRef:
+      type: object
+      description: 带版本的引用描述符.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        version:
+          $ref: '#/components/schemas/VersionSerial'
+      required:
+        - id
+    VersionSerial:
+      type: integer
+      format: int32
+      description: |
+        版本对应的序号.
+      minimum: 0
     AccountBrief:
       type: object
       description: 作者的简单信息.
@@ -1786,6 +1498,10 @@ components:
       description: 用于管理的描述信息.
       minLength: 1
       maxLength: 250
+    Timestamp:
+      type: integer
+      format: int64
+      description: 时间戳.
     ObjectID:
       type: string
       description: MongoDB:ObjectId
@@ -1861,7 +1577,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sundial.benbenedu.cn:9001/account/oauth/token"
+          tokenUrl: "http://sundial.benbenedu.cn:9001/xauth/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:
