@@ -23,7 +23,14 @@ paths:
       tags: 
         - ResourceTag
       summary: 创建资源标签.
-      description: 创建资源标签.
+      description: |
+        创建资源标签.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: createRsrcTag
       requestBody:
         description: 请求创建的资源标签信息.
@@ -63,7 +70,14 @@ paths:
       tags: 
         - ResourceTag
       summary: Query资源标签.
-      description: Query资源标签.
+      description: |
+        Query资源标签.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryRsrcTags
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -96,7 +110,14 @@ paths:
       tags: 
         - ResourceTag
       summary: 获取指定的资源标签详情.
-      description: 获取指定的资源标签详情.
+      description: |
+        获取指定的资源标签详情.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getRsrcTagById
       parameters: 
         - name: rsrctag-id
@@ -126,7 +147,14 @@ paths:
       tags: 
         - Resource
       summary: 创建资源.
-      description: 创建资源. 新创建资源的初始状态为Developing.
+      description: |
+        创建资源. 新创建资源的初始状态为Developing.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: createResource
       requestBody:
         description: 请求创建的资源信息.
@@ -166,7 +194,17 @@ paths:
       tags: 
         - Resource
       summary: Query资源.
-      description: Query资源.
+      description: |
+        Query资源.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: queryResources
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -203,6 +241,15 @@ paths:
         获取指定的资源详情.  
         若未指定版本,则从主库中查找.  
         若指定了版本,则从档案库中查找.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: getResourceById
       parameters: 
         - name: resource-id
@@ -244,6 +291,12 @@ paths:
           1. 更新状态为Developing
           2. 递增version.serial并更新version.creator
           3. 更新请求中的对应信息
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: patchResourceById
       parameters: 
         - name: resource-id
@@ -308,6 +361,15 @@ paths:
         获取指定的资源内容.  
         若未指定版本,则从主库中查找.  
         若指定了版本,则从档案库中查找.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: getRsrcContentByIdAndNumber
       parameters: 
         - name: resource-id
@@ -356,6 +418,15 @@ paths:
         获取指定资源内容的实际访问地址.  
         若未指定版本,则从主库中查找.  
         若指定了版本,则从档案库中查找.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: getRsrcContentUrlByIdAndNumber
       parameters: 
         - name: resource-id
@@ -406,6 +477,12 @@ paths:
           2. 在档案库中创建主库中当前资源的副本
         
         对于其它允许的状态转移路径,则仅需修改主库中当前资源的状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: updateRsrcStateById
       parameters: 
         - name: resource-id
@@ -460,6 +537,12 @@ paths:
         
         若当前状态为Usable,则需同时更新主库和档案库中当前版本资源的标签集.  
         若为其它状态,则仅需更新主库中的资源.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: updateRsrcTagsById
       parameters: 
         - name: resource-id
