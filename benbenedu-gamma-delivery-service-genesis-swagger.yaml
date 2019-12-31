@@ -29,7 +29,14 @@ paths:
       tags: 
         - ExamStation
       summary: 创建考试站.
-      description: 创建考试站.
+      description: |
+        创建考试站.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: createExamStation
       requestBody:
         description: 请求创建的考试站信息.
@@ -69,7 +76,14 @@ paths:
       tags: 
         - ExamStation
       summary: Query考试站.
-      description: Query考试站.
+      description: |
+        Query考试站.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryExamStations
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -102,7 +116,14 @@ paths:
       tags: 
         - ExamStation
       summary: 获取指定的考试站详情.
-      description: 获取指定的考试站详情.
+      description: |
+        获取指定的考试站详情.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getExamStationById
       parameters: 
         - name: examstation-id
@@ -131,7 +152,14 @@ paths:
       tags:
         - ExamStation
       summary: 更新指定考试站的信息.
-      description: 更新指定考试站的信息.
+      description: |
+        更新指定考试站的信息.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: updateExamStationById
       parameters: 
         - name: examstation-id
@@ -192,7 +220,14 @@ paths:
       tags: 
         - ExamStation
       summary: 更新指定考试站的状态.
-      description: 更新指定考试站的状态.
+      description: |
+        更新指定考试站的状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: updateExamStationStateById
       parameters: 
         - name: examstation-id
@@ -242,7 +277,14 @@ paths:
       tags: 
         - ExamStation
       summary: 获取指定考试站的运行状态.
-      description: 获取指定考试站的运行状态.
+      description: |
+        获取指定考试站的运行状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEstationRunStatusById
       parameters: 
         - name: examstation-id
@@ -272,7 +314,14 @@ paths:
       tags:
         - ExamPaperDelivery
       summary: 提交试卷递送任务.
-      description: 提交试卷递送任务.
+      description: |
+        提交试卷递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: submitExamPaperDelivery
       requestBody:
         description: 提交的试卷递送任务信息.
@@ -301,7 +350,14 @@ paths:
       tags: 
         - ExamPaperDelivery
       summary: Query试卷递送任务.
-      description: Query试卷递送任务.
+      description: |
+        Query试卷递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryEpDeliveryTasks
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -334,7 +390,14 @@ paths:
       tags: 
         - ExamPaperDelivery
       summary: 获取指定的试卷递送任务.
-      description: 获取指定的试卷递送任务.
+      description: |
+        获取指定的试卷递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEpDeliveryTaskById
       parameters: 
         - name: epdelivery-id
@@ -364,7 +427,14 @@ paths:
       tags: 
         - ExamPaperDelivery
       summary: 更新指定试卷递送任务的状态.
-      description: 更新指定试卷递送任务的状态.
+      description: |
+        更新指定试卷递送任务的状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: updateEpDeliveryTaskStateById
       parameters: 
         - name: epdelivery-id
@@ -414,7 +484,14 @@ paths:
       tags: 
         - ExamPaperDelivery
       summary: 执行指定的试卷递送任务.
-      description: '执行指定的试卷递送任务.仅当任务处于Active状态时,才允许执行该任务.'
+      description: |
+        '执行指定的试卷递送任务.仅当任务处于Active状态时,才允许执行该任务.'
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: performEpDeliveryTaskById
       parameters: 
         - name: epdelivery-id
@@ -464,7 +541,14 @@ paths:
       tags:
         - ExamPaperDelivery
       summary: 获取试卷递送任务对应的发行物的状态.
-      description: 获取试卷递送任务对应的发行物的状态.
+      description: |
+        获取试卷递送任务对应的发行物的状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEpPubStatusById
       parameters: 
         - name: epdelivery-id
@@ -498,6 +582,12 @@ paths:
         提交试卷模子递送任务.
         若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
         任务自动执行.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: submitEpmDelivery
       requestBody:
         description: 提交的试卷模子递送任务信息.
@@ -522,7 +612,14 @@ paths:
       tags: 
         - EpMoldDelivery
       summary: Query试卷模子递送任务.
-      description: Query试卷模子递送任务.
+      description: |
+        Query试卷模子递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryEpmDeliveryTasks
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -555,7 +652,14 @@ paths:
       tags: 
         - EpMoldDelivery
       summary: 获取指定试卷模子对应的递送任务.
-      description: 获取指定试卷模子对应的递送任务.
+      description: |
+        获取指定试卷模子对应的递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEpmDeliveryTaskByVersionedEpm
       parameters: 
         - name: epm-id
@@ -595,6 +699,12 @@ paths:
         提交考试递送任务.
         若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
         任务自动执行.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: submitExamDelivery
       requestBody:
         description: 提交的考试递送任务信息.
@@ -619,7 +729,14 @@ paths:
       tags: 
         - ExamDelivery
       summary: Query考试递送任务.
-      description: Query考试递送任务.
+      description: |
+        Query考试递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryExamDeliveryTasks
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -652,7 +769,14 @@ paths:
       tags: 
         - ExamDelivery
       summary: 获取指定考试对应的递送任务.
-      description: 获取指定考试对应的递送任务.
+      description: |
+        获取指定考试对应的递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getExamDeliveryTaskByExamId
       parameters: 
         - name: exam-id
@@ -686,6 +810,12 @@ paths:
         提交考试链递送任务.
         若对应的递送任务已存在, 则不再创建新的任务, 而是重新执行已存在的任务.
         任务自动执行.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
       operationId: submitEchainDelivery
       requestBody:
         description: 提交的考试链递送任务信息.
@@ -710,7 +840,14 @@ paths:
       tags: 
         - EchainDelivery
       summary: Query考试链递送任务.
-      description: Query考试链递送任务.
+      description: |
+        Query考试链递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryEchainDeliveryTasks
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -743,7 +880,14 @@ paths:
       tags: 
         - EchainDelivery
       summary: 获取指定考试链对应的递送任务.
-      description: 获取指定考试链对应的递送任务.
+      description: |
+        获取指定考试链对应的递送任务.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEchainDeliveryTaskByEchainId
       parameters: 
         - name: echain-id
