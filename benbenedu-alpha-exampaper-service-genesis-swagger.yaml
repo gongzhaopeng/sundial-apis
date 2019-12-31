@@ -25,7 +25,14 @@ paths:
       tags: 
         - EpmTag
       summary: 创建试卷模子标签.
-      description: 创建试卷模子标签.
+      description: |
+        创建试卷模子标签.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: createEpmTag
       requestBody:
         description: 请求创建的试卷模子标签信息.
@@ -65,7 +72,14 @@ paths:
       tags: 
         - EpmTag
       summary: Query试卷模子标签.
-      description: Query试卷模子标签.
+      description: |
+        Query试卷模子标签.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: queryEpmTags
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -98,7 +112,14 @@ paths:
       tags: 
         - EpmTag
       summary: 获取指定的试卷模子标签详情.
-      description: 获取指定的试卷模子标签详情.
+      description: |
+        获取指定的试卷模子标签详情.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
       operationId: getEpmTagById
       parameters: 
         - name: epmtag-id
@@ -128,7 +149,14 @@ paths:
       tags:
         - ExamPaperMold
       summary: 创建试卷模子.
-      description: 创建试卷模子.
+      description: |
+        创建试卷模子.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: createEpMold
       requestBody:
         description: 请求创建的试卷模子设计信息.
@@ -168,7 +196,17 @@ paths:
       tags: 
         - ExamPaperMold
       summary: Query试卷模子.
-      description: Query试卷模子.
+      description: |
+        Query试卷模子.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: queryEpMolds
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -205,6 +243,15 @@ paths:
         获取指定的试卷模子详情.  
         若未指定版本,则从主库中查找.  
         若指定了版本,则从档案库中查找.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: getEpMoldById
       parameters: 
         - name: epmold-id
@@ -247,6 +294,12 @@ paths:
           1. 更新状态为Developing
           2. 递增version.serial并更新version.creator
           3. 更新请求中的对应信息
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: updateEpMoldById
       parameters: 
         - name: epmold-id
@@ -315,6 +368,12 @@ paths:
           2. 在档案库中创建主库中当前试卷模子的副本
         
         对于其它允许的状态转移路径,则仅需修改主库中当前试卷模子的状态.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: updateEpmStateById
       parameters: 
         - name: epmold-id
@@ -369,6 +428,12 @@ paths:
         
         若当前状态为Usable,则需同时更新主库和档案库中当前版本试卷模子的标签集.  
         若为其它状态,则仅需更新主库中的试卷模子.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: updateEpmTagsById
       parameters: 
         - name: epmold-id
@@ -413,7 +478,14 @@ paths:
       tags: 
         - ExamPaper
       summary: 创建试卷.
-      description: 创建试卷.
+      description: |
+        创建试卷.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamPaperBuilder" in roles}
       operationId: createExamPaper
       requestBody:
         description: 创建试卷的请求信息.
@@ -444,7 +516,17 @@ paths:
       tags: 
         - ExamPaper
       summary: Query试卷.
-      description: Query试卷.
+      description: |
+        Query试卷.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: queryExamPapers
       parameters:
         - $ref: '#/components/parameters/pageNumber'
@@ -477,7 +559,17 @@ paths:
       tags:
         - ExamPaper
       summary: 获取指定的试卷详情.
-      description: 获取指定的试卷详情.
+      description: |
+        获取指定的试卷详情.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+        #### **内部服务**
+        - authenticated
+        - Client{'service:inner' in scope} 
       operationId: getExamPaperById
       parameters: 
         - name: exampaper-id
