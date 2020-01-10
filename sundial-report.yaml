@@ -126,66 +126,6 @@ paths:
       security:
         - examStationAuth: 
           - client:inner
-  /examreports/to/ticket/{ticket-id}:
-    get:
-      tags: 
-        - ExamReport
-      summary: 获取指定考试准考证对应的个人报告.
-      description: |
-        获取指定考试准考证对应的个人报告.
-        
-        ### 权限控制
-        #### **所有人账户**
-        - authenticated
-        - ExamAticket(owner is current account)
-        #### **合作客户端**
-        - authenticated
-        - Client{'client:partner' in scope}  
-        - Exam::owner is Client::owner
-      operationId: getExamReportByAticket
-      parameters:
-        - name: ticket-id
-          in: path
-          description: 指定考试准考证的ID.
-          required: true
-          schema:
-            $ref: '#/components/schemas/ObjectID'
-      responses:
-        '200':
-          description: 获取成功.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExamPersonalReport'
-        '401':
-          description: Unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                accessLimited:
-                  value:
-                    code: 'AccessLimited'
-                    detail: '${detail}'
-        '403':
-          description: Forbidden.
-        '404':
-          description: 指定的报告不存在.
-        '428':
-          description: Precondition Required.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidExamAticket:
-                  value:
-                    code: 'InvalidExamAticket'
-                    detail: '${detail}'
-      security:
-        - examResultAuth: 
-          - client:inner
 components:
   schemas:
     ExamReportConfigUpdatingReq:
@@ -239,65 +179,6 @@ components:
         # TODO
       minLength: 1
       maxLength: 50
-    ExamPersonalReport:
-      type: object
-      description: 考试个人报告.
-      properties:
-        aticket:
-          $ref: '#/components/schemas/ObjectID'
-        createTime:
-          $ref: '#/components/schemas/Timestamp'
-        lUTime:
-          $ref: '#/components/schemas/Timestamp'
-        owner:
-          $ref: '#/components/schemas/ObjectID'
-        exam:
-          $ref: '#/components/schemas/ObjectID'
-        type:
-          $ref: '#/components/schemas/ExamPersonalReportType'
-        data:
-          $ref: '#/components/schemas/ReportData'
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReportFile'
-          minLength: 1
-      required:
-        - aticket
-        - createTime
-        - lUTime
-        - owner
-        - exam
-        - type
-        - data
-    ExamPersonalReportType:
-      type: string
-      description: 考试个人报告类型.
-      enum: 
-        - Undefined
-        # TODO
-      minLength: 1
-      maxLength: 50
-    ReportData:
-      type: object
-      description: |
-        报告数据.
-      additionalProperties:
-        type: string
-      minLength: 1
-    ReportFile:
-      type: object
-      description: |
-        报告文件.
-      properties:
-        mediaType:
-          $ref: '#/components/schemas/MediaTypeField'
-        size:
-          type: integer
-          format: int32
-          description: File size in bytes.
-        url:
-          $ref: '#/components/schemas/URL'
     IdAnyMatchQueryField:
       type: array
       items:
@@ -401,7 +282,6 @@ components:
         - LUTimeConflict
         - AlteringNotAllowed
         - SpecifiedStateConversionNotAllowed
-        - InvalidExamAticket
     BasicPage:
       type: object
       description: 分页基本信息.
