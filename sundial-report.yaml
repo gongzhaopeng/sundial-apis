@@ -1,1 +1,489 @@
-
+openapi: 3.0.0
+info:
+  version: 'genesis'
+  title: 'Report Service API'
+  description: 'Sundial:Report-Service对应的API.'
+  contact:
+    email: gongguochuanqi@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: http://sundial.benbenedu.cn:9001/report/genesis
+tags:
+  - name: ExamReport
+    description: 访问考试报告.
+paths:
+  /examreports/config/to/exam/{exam-id}:
+    get:
+      tags: 
+        - ExamReport
+      summary: 获取指定考试对应的报告配置信息.
+      description: |
+        获取指定考试对应的报告配置信息.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner'}
+      operationId: getReportConfigByExam
+      parameters:
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamReportConfig'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                accessLimited:
+                  value:
+                    code: 'AccessLimited'
+                    detail: '${detail}'
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试报告配置信息不存在.
+      security:
+        - examResultAuth: 
+          - client:inner
+    put:
+      tags: 
+        - ExamReport
+      summary: 更新指定考试对应的报告配置信息.
+      description: |
+        更新指定考试对应的报告配置信息.
+        
+        ### 权限控制
+        #### **内部账户**
+        - authenticated
+        - Client{'client:inner' in scope}  
+        - Account{type='Inner', "ExamBuilder" in roles}
+      operationId: updateReportConfigByExam
+      parameters:
+        - name: exam-id
+          in: path
+          description: 指定考试的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      requestBody:
+        description: 请求信息.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamReportConfigUpdatingReq'
+      responses:
+        '200':
+          description: 更新成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamReportConfig'
+        '400':
+          description: Bad Request.
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                accessLimited:
+                  value:
+                    code: 'AccessLimited'
+                    detail: '${detail}'
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的考试不存在.
+        '428':
+          description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lUTimeConflict:
+                  value:
+                    code: 'LUTimeConflict'
+                    detail: '${detail}'
+      security:
+        - examStationAuth: 
+          - client:inner
+  /examreports/to/ticket/{ticket-id}:
+    get:
+      tags: 
+        - ExamReport
+      summary: 获取指定考试准考证对应的个人报告.
+      description: |
+        获取指定考试准考证对应的个人报告.
+        
+        ### 权限控制
+        #### **所有人账户**
+        - authenticated
+        - ExamAticket(owner is current account)
+        #### **合作客户端**
+        - authenticated
+        - Client{'client:partner' in scope}  
+        - Exam::owner is Client::owner
+      operationId: getExamReportByAticket
+      parameters:
+        - name: ticket-id
+          in: path
+          description: 指定考试准考证的ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/ObjectID'
+      responses:
+        '200':
+          description: 获取成功.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamPersonalReport'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                accessLimited:
+                  value:
+                    code: 'AccessLimited'
+                    detail: '${detail}'
+        '403':
+          description: Forbidden.
+        '404':
+          description: 指定的报告不存在.
+        '428':
+          description: Precondition Required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidExamAticket:
+                  value:
+                    code: 'InvalidExamAticket'
+                    detail: '${detail}'
+      security:
+        - examResultAuth: 
+          - client:inner
+components:
+  schemas:
+    ExamReportConfigUpdatingReq:
+      type: object
+      description: 考试报告配置更新请求.
+      properties:
+        personalReport:
+          $ref: '#/components/schemas/ExamPersonalReportConfig'
+    ExamReportConfig:
+      type: object
+      description: 考试报告配置.
+      properties:
+        exam:
+          $ref: '#/components/schemas/ObjectID'
+        createTime:
+          $ref: '#/components/schemas/Timestamp'
+        lUTime:
+          $ref: '#/components/schemas/Timestamp'
+        creator:
+          $ref: '#/components/schemas/AccountBrief'
+        personalReport:
+          $ref: '#/components/schemas/ExamPersonalReportConfig'
+    ExamPersonalReportConfig:
+      type: object
+      description: 考试个人报告配置.
+      properties:
+        algorithm:
+          $ref: '#/components/schemas/ExamPersonalReportAlgorithm'
+    ExamPersonalReportAlgorithm:
+      type: object
+      description: 考试个人报告算法.
+      properties:
+        type:
+          $ref: '#/components/schemas/ExamPersonalReportAlgType'
+        metadata:
+          type: object
+          description: 算法元数据.用于定义辅助的算法参数.
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 500
+          minLength: 1
+          maxLength: 50
+      required: 
+        - type
+    ExamPersonalReportAlgType:
+      type: string
+      description: 考试个人报告算法类型.
+      enum: 
+        - Undefined
+        # TODO
+      minLength: 1
+      maxLength: 50
+    ExamPersonalReport:
+      type: object
+      description: 考试个人报告.
+      properties:
+        aticket:
+          $ref: '#/components/schemas/ObjectID'
+        createTime:
+          $ref: '#/components/schemas/Timestamp'
+        lUTime:
+          $ref: '#/components/schemas/Timestamp'
+        owner:
+          $ref: '#/components/schemas/ObjectID'
+        exam:
+          $ref: '#/components/schemas/ObjectID'
+        type:
+          $ref: '#/components/schemas/ExamPersonalReportType'
+        data:
+          $ref: '#/components/schemas/ReportData'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportFile'
+          minLength: 1
+      required:
+        - aticket
+        - createTime
+        - lUTime
+        - owner
+        - exam
+        - type
+        - data
+    ExamPersonalReportType:
+      type: string
+      description: 考试个人报告类型.
+      enum: 
+        - Undefined
+        # TODO
+      minLength: 1
+      maxLength: 50
+    ReportData:
+      type: object
+      description: |
+        报告数据.
+      additionalProperties:
+        type: string
+      minLength: 1
+    ReportFile:
+      type: object
+      description: |
+        报告文件.
+      properties:
+        mediaType:
+          $ref: '#/components/schemas/MediaTypeField'
+        size:
+          type: integer
+          format: int32
+          description: File size in bytes.
+        url:
+          $ref: '#/components/schemas/URL'
+    IdAnyMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>any-match.
+      minLength: 1
+      maxLength: 50
+    IdAllMatchQueryField:
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectID'
+      description: 指定的id集合. =relation=>all-match.
+      minLength: 1
+      maxLength: 50
+    TimeQueryField:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
+      minLength: 2
+      maxLength: 20
+    TextSearchSpec:
+      type: object
+      description: 文本搜索描述对象.
+      properties:
+        include:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+        exclude:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 25
+          description: =relation=>all.
+          minLength: 1
+          maxLength: 10
+    AccountBrief:
+      type: object
+      description: 账户的简单信息.
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectID'
+        name:
+          type: string
+        nickname:
+          type: string
+      required: 
+        - id
+    MgmtDescriptionField:
+      type: string
+      description: 用于管理的描述信息.
+      minLength: 1
+      maxLength: 250
+    MediaTypeField:
+      type: string
+      externalDocs: 
+        description: wiki
+        url: https://en.wikipedia.org/wiki/Media_type
+      description: mime.types
+      minLength: 1
+      maxLength: 100
+    URL:
+      type: string
+      description: url.
+      minLength: 1
+      maxLength: 250
+    Timestamp:
+      type: integer
+      format: int64
+      description: 时间戳.
+    ObjectID:
+      type: string
+      description: MongoDB:ObjectId
+      minLength: 24
+      maxLength: 24
+    ErrorResponse:
+      description: 错误响应.
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorResponseCode'
+        detail:
+          type: string
+          description: 错误详情.
+      required:
+        - code
+    ErrorResponseCode:
+      type: string
+      description: 错误码.
+      enum: 
+        - Undefined
+        - AccessLimited
+        - LUTimeConflict
+        - AlteringNotAllowed
+        - SpecifiedStateConversionNotAllowed
+        - InvalidExamAticket
+    BasicPage:
+      type: object
+      description: 分页基本信息.
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+      required: 
+        - totalPages
+        - totalElements
+    PageNumberSpec:
+      type: integer
+      format: int32
+      minimum: 0
+      default: 0
+    PageSizeSpec:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 10
+    PageSortWithDefaultCreateTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'createTime,desc'
+    PageSortWithDefaultLUTimeDescSpec:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 50
+      minLength: 1
+      maxLength: 5
+      default: 
+        - 'lUTime,desc'
+        
+        
+  securitySchemes:
+    examResultAuth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "http://sundial.benbenedu.cn:9001/xauth/oauth/token"
+          scopes:
+            'client:inner': 内网客户端
+  
+            
+  parameters:
+    pageNumber:
+      name: page
+      in: query
+      description: 指定页码.
+      schema:
+        $ref: '#/components/schemas/PageNumberSpec'
+    pageSize:
+      name: size
+      in: query
+      description: 指定页长.
+      schema:
+        $ref: '#/components/schemas/PageSizeSpec'
+    pageSortWithDefaultCreateTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        $ref: '#/components/schemas/PageSortWithDefaultCreateTimeDescSpec'
+      style: form
+      explode: true
+    pageSortWithDefaultLUTimeDesc:
+      name: sort
+      in: query
+      description: '排序规则. Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+      schema:
+        $ref: '#/components/schemas/PageSortWithDefaultLUTimeDescSpec'
+      style: form
+      explode: true
