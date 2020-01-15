@@ -15,8 +15,10 @@ servers:
 tags:
   - name: OAuth
     description: OAuth.
-  - name: OAuth
+  - name: Stream
     description: Stream.
+  - name: Cache
+    description: Cache.
 paths:
   /oauth/hello:
     get:
@@ -41,6 +43,24 @@ paths:
     get:
       tags: 
         - Stream
+      responses:
+        '200':
+          description: 成功.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+      security:
+        - mouseAuth: 
+          - client:inner
+  /cache/hello:
+    get:
+      tags: 
+        - Cache
       responses:
         '200':
           description: 成功.
