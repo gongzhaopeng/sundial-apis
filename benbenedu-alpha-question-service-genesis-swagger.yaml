@@ -783,7 +783,9 @@ components:
       description: 题目单位的形式.
       enum: 
         - Choice
+        - ChoiceExt
         - MChoice
+        - MChoiceExt
         - FillIn
         - QA
         - Composite
