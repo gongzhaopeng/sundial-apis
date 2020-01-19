@@ -672,6 +672,8 @@ components:
           description: 指定state所属的集合. =relation=>in.
           minLength: 1
           maxLength: 10
+        exactTitle:
+          $ref: '#/components/schemas/TextExactMatchQueryField'
         title:
           $ref: '#/components/schemas/TextSearchSpec'
         description:
@@ -896,6 +898,15 @@ components:
       description: 指定时间所属的区间序列. =relation=>in. 数组长度必须为偶数.
       minLength: 2
       maxLength: 20
+    TextExactMatchQueryField:
+      type: array
+      items:
+        type: string
+        minLength: 1
+        maxLength: 250
+      description: 指定的Text集合. =relation=>any-match.
+      minLength: 1
+      maxLength: 50
     TextSearchSpec:
       type: object
       description: 文本搜索描述对象.
