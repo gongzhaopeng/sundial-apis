@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: http://sundial.benbenedu.cn:9001/resource/genesis
+    url: http://sd1.benbenedu.cn:9000/resource/genesis
 tags:
   - name: ResourceTag
     description: 访问资源标签.
@@ -1065,7 +1065,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sundial.benbenedu.cn:9001/xauth/oauth/token"
+          tokenUrl: "http://sd1.benbenedu.cn:9000/xauth/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:
