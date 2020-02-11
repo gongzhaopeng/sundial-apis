@@ -641,6 +641,9 @@ components:
           $ref: '#/components/schemas/MediaTypeField'
         content:
           $ref: '#/components/schemas/ResourceRawContent'
+        defaultUsable:
+          type: boolean
+          description: 是否缺省可用.
       required:
         - title
         - mediaType
