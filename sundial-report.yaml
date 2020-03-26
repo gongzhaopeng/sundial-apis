@@ -176,6 +176,7 @@ components:
       description: 考试个人报告算法类型.
       enum: 
         - Undefined
+        - PublishPersonalReportReq
         # TODO
       minLength: 1
       maxLength: 50
