@@ -11,7 +11,7 @@ info:
 servers:
 # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: http://sd1.benbenedu.cn:9000/exampaper/genesis
+    url: http://sd3.benbenedu.cn:9000/exampaper/genesis
 tags:
   - name: EpmTag
     description: 访问试卷模子标签.
@@ -1599,7 +1599,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sd1.benbenedu.cn:9000/xauth/oauth/token"
+          tokenUrl: "http://sd3.benbenedu.cn:9000/xauth/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:

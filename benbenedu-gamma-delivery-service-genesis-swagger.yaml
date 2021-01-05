@@ -11,7 +11,7 @@ info:
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: http://sd1.benbenedu.cn:9000/delivery/genesis
+    url: http://sd3.benbenedu.cn:9000/delivery/genesis
 tags:
   - name: ExamStation
     description: 访问考试站.
@@ -1722,7 +1722,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: "http://sd1.benbenedu.cn:9000/xauth/oauth/token"
+          tokenUrl: "http://sd3.benbenedu.cn:9000/xauth/oauth/token"
           scopes:
             'client:inner': 内网客户端
   parameters:
